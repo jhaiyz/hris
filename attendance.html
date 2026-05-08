@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Attendance</title>
+<style>
+body{font-family:Arial;background:#f4f6f9;}
+.box{max-width:420px;margin:40px auto;background:white;padding:25px;border-radius:12px;}
+input,select,button{width:100%;padding:12px;margin-top:10px;}
+button{background:#007bff;color:white;border:0;border-radius:8px;}
+#msg{margin-top:15px;font-size:13px;font-weight:bold;text-align:center;}
+</style>
+</head>
+<body>
+<div class="box">
+<h3>QR Attendance</h3>
+<div id="lblArea"></div>
+<label>Employee No</label>
+<input id="emp">
+<label>Log Type</label>
+<select id="logType">
+<option value="">Select</option>
+<option value="DS-CHECK IN">DS-CHECK IN</option>
+<option value="DS-BREAK">DS-BREAK</option>
+<option value="DS-RESUME">DS-RESUME</option>
+<option value="DS-CHECK OUT">DS-CHECK OUT</option>
+<option value="NS-CHECK IN">NS-CHECK IN</option>
+<option value="NS-BREAK">NS-BREAK</option>
+<option value="NS-RESUME">NS-RESUME</option>
+<option value="NS-CHECK OUT">NS-CHECK OUT</option>
+</select>
+<button onclick="startAuth()">Authenticate & Log</button>
+<div id="msg"></div>
+</div>
+
+<script>
+const urlParams=new URLSearchParams(location.search);
+const token=urlParams.get("token")||"";
+const area=urlParams.get("area")||"Manual";
+document.getElementById("lblArea").innerHTML="Area: "+area;
+
+async function startAuth(){
+    let emp=document.getElementById("emp").value;
+    let logType=document.getElementById("logType").value;
+    if(!emp){ alert("Enter employee number"); return; }
+    if(!logType){ alert("Select log type"); return; }
+    msg("Checking device...");
+
+    let device=await fetch("check-device.php?employee_no="+emp);
+    let dev=await device.json();
+
+    try{
+        if(dev.exists){ await authenticate(emp); }
+        else{ await registerDevice(emp); }
+    }catch(e){
+        msg("Registering new fingerprint...");
+        await registerDevice(emp);
+    }
+
+    await saveLog(emp,logType);
+}
+
+async function authenticate(emp){
+    msg("Scan fingerprint...");
+    let res=await fetch("verify-challenge.php?employee_no="+emp);
+    let opt=await res.json();
+
+    opt.challenge=Uint8Array.from(atob(opt.challenge),c=>c.charCodeAt(0));
+    if(opt.allowCredentials){
+        opt.allowCredentials=opt.allowCredentials.map(x=>({id:Uint8Array.from(atob(x.id),c=>c.charCodeAt(0)),type:"public-key"}));
+    }
+    await navigator.credentials.get({publicKey:opt});
+}
+
+async function registerDevice(emp){
+    msg("Register fingerprint...");
+    let challenge=new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+    let cred=await navigator.credentials.create({publicKey:{challenge:challenge,rp:{name:"HRIS"},user:{id:new TextEncoder().encode(emp),name:emp,displayName:emp},pubKeyCredParams:[{type:"public-key",alg:-7}]}});
+    let id=btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
+    await fetch("register-complete.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({employeeNo:emp,credentialId:id})});
+}
+
+async function saveLog(emp,logType){
+    msg("Saving attendance...");
+    try{
+        let res=await fetch("verify-complete.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({employeeNo:emp,logType:logType,token:token,area:area})});
+        if(!res.ok){ msg("Server error: "+res.status); return; }
+        let data=await res.json();
+        msg(data.message);
+    }catch(err){
+        msg("Fetch failed: "+err);
+    }
+}
+
+function msg(t){ document.getElementById("msg").innerHTML=t; }
+</script>
+</body>
+</html>
