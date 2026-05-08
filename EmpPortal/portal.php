@@ -671,8 +671,16 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
 
         <!-- LEAVE -->
         <div class="panel" id="panel-leave">
-            <?php include 'modules/application-leave.php'; ?>
+
+            <link rel="stylesheet" href="modules/leave/leave.css">
+
+            <?php include __DIR__ . '/modules/leave/leave.php'; ?>
+
         </div>
+
+        <?php include __DIR__ . '/modules/leave/leave-modal.php'; ?>
+
+        <script src="modules/leave/leave.js"></script>
 
         <!-- TRAINING REQUEST -->
         <div class="panel" id="panel-training-request">
