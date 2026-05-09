@@ -98,7 +98,10 @@ $dbLT->close();
                             <button class="icon-btn btn-edit"   disabled>✏️</button>
                             <button class="icon-btn btn-delete" disabled>🗑️</button>
                             <?php endif; ?>
-                            <button class="icon-btn btn-print">🖨️</button>
+                            <button class="icon-btn btn-print"
+                            onclick="printLeave(<?= (int)$row['app_ID'] ?>)"
+                            title="Print Leave Application">🖨️
+                            </button>
                         </div>
                     </td>
                     <td>
