@@ -144,8 +144,7 @@
                 </div>
             </div>
 
-            <!-- Alert -->
-            <div class="lm-alert" id="lmAlert"></div>
+            
 
         </div><!-- end lm-body -->
 
@@ -157,6 +156,9 @@
                 <span id="lmSubmitLabel">Submit Application</span>
             </button>
         </div>
+
+        <!-- Alert -->
+            <div class="lm-alert" id="lmAlert"></div>
 
     </div>
 </div>
