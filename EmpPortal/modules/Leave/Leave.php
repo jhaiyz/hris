@@ -120,6 +120,7 @@ $dbLT->close();
             <?php endwhile; ?>
             </tbody>
         </table>
+        
     </div>
 </div>
 

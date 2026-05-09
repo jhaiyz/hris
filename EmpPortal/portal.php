@@ -679,6 +679,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         </div>
 
         <?php include __DIR__ . '/modules/leave/leave-modal.php'; ?>
+        <?php include __DIR__ . '/modules/leave/delete-leave-modal.php'; ?>
 
         <script src="modules/leave/leave.js?v=<?= time() ?>"></script>
 

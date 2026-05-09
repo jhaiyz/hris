@@ -342,16 +342,44 @@ function lmPrependRow(row) {
 // ─────────────────────────────────────────────
 // DELETE
 // ─────────────────────────────────────────────
-async function deleteLeave(appID) {
+function deleteLeave(appID) {
 
-    if (!confirm('Are you sure you want to delete this leave application?')) return;
+    var row = document.getElementById('leave-row-' + appID);
+    if (!row) return;
+
+    // extract values from table row
+    var particulars = row.querySelector('td:nth-child(3)').innerText;
+    var nod         = row.querySelector('td:nth-child(4)').innerText;
+    var dates       = row.querySelector('td:nth-child(5)').innerText;
+
+    // fill modal
+    document.getElementById('del_appID').value = appID;
+    document.getElementById('del_particulars').innerText = particulars;
+    document.getElementById('del_nod').innerText = nod;
+    document.getElementById('del_dates').innerText = dates;
+
+    // show modal
+    document.getElementById('deleteLeaveModal').classList.add('show');
+}
+function closeDeleteModal() {
+    document.getElementById('deleteLeaveModal').classList.remove('show');
+}
+async function confirmDeleteLeave() {
+
+    var appID = document.getElementById('del_appID').value;
+
+    var btn     = document.querySelector('#deleteLeaveModal .lm-btn-submit');
+    var spinner = document.getElementById('delSpinner');
+
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
 
     try {
 
-        var res  = await fetch('./modules/leave/delete-leave.php', {
-            method:  'POST',
+        var res = await fetch('./modules/leave/delete-leave.php', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ app_ID: appID })
+            body: JSON.stringify({ app_ID: appID })
         });
 
         var data = await res.json();
@@ -359,19 +387,24 @@ async function deleteLeave(appID) {
         if (data.success) {
 
             var tr = document.getElementById('leave-row-' + appID);
+
             if (tr) {
-                tr.style.transition = 'opacity 0.35s';
-                tr.style.opacity    = '0';
-                setTimeout(function () { tr.remove(); }, 380);
+                tr.style.transition = 'opacity .3s';
+                tr.style.opacity = '0';
+                setTimeout(() => tr.remove(), 300);
             }
 
+            closeDeleteModal();
+
         } else {
-            alert(data.message || 'Delete failed. Please try again.');
+            alert(data.message || 'Delete failed.');
         }
 
     } catch (err) {
         console.error(err);
-        alert('Server error while deleting.');
+        alert('Server error.');
     }
 
+    btn.disabled = false;
+    spinner.style.display = 'none';
 }
