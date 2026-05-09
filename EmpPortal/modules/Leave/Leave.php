@@ -16,6 +16,10 @@ $sqlLeave = "
         a.Inclusive_Dates,
         a.Status,
         a.Remarks,
+        a.DOL_A,
+        a.DOL_B,
+        a.DOL_C,
+        a.lt_ID,
         l.Description AS LeaveDescription
     FROM tblappleave a
     LEFT JOIN tbl_lt l
@@ -66,16 +70,34 @@ $dbLT->close();
             <tbody id="leaveTableBody">
             <?php while ($row = $resLeave->fetch_assoc()): ?>
                 <?php
-                    $isPending = ($row['Status'] === 'Pending Approval');
+                    $isPending  = ($row['Status'] === 'Pending Approval');
                     $statusClass = 'status-pending';
-                    if ($row['Status'] === 'Approved') $statusClass = 'status-approved';
+                    if ($row['Status'] === 'Approved')    $statusClass = 'status-approved';
                     elseif ($row['Status'] === 'Disapproved') $statusClass = 'status-disapproved';
+
+                    // JSON stored in data-row attribute — no quote collision with onclick
+                    $rowData = htmlspecialchars(json_encode([
+                        'app_ID'          => (int)$row['app_ID'],
+                        'lt_ID'           => (int)$row['lt_ID'],
+                        'dol_b'           => $row['DOL_B'],
+                        'dol_c'           => $row['DOL_C'] ?? '',
+                        'nod'             => $row['NOD'],
+                        'inclusive_dates' => $row['Inclusive_Dates'],
+                    ]), ENT_QUOTES, 'UTF-8');
                 ?>
-                <tr>
+                <tr id="leave-row-<?= $row['app_ID'] ?>">
                     <td>
                         <div class="action-buttons">
-                            <button class="icon-btn btn-edit" <?= !$isPending ? 'disabled' : '' ?>>✏️</button>
-                            <button class="icon-btn btn-delete" <?= !$isPending ? 'disabled' : '' ?>>🗑️</button>
+                            <?php if ($isPending): ?>
+                            <button class="icon-btn btn-edit"
+                                    data-row="<?= $rowData ?>"
+                                    onclick="lmEditClick(this)">✏️</button>
+                            <button class="icon-btn btn-delete"
+                                    onclick="deleteLeave(<?= (int)$row['app_ID'] ?>)">🗑️</button>
+                            <?php else: ?>
+                            <button class="icon-btn btn-edit"   disabled>✏️</button>
+                            <button class="icon-btn btn-delete" disabled>🗑️</button>
+                            <?php endif; ?>
                             <button class="icon-btn btn-print">🖨️</button>
                         </div>
                     </td>
@@ -100,8 +122,6 @@ $dbLT->close();
         </table>
     </div>
 </div>
-
-
 
 <?php
 $stmtLeave->close();

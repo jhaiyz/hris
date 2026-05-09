@@ -1,4 +1,4 @@
-<!-- ── NEW LEAVE APPLICATION MODAL ──────────────────── -->
+<!-- ── NEW / EDIT LEAVE APPLICATION MODAL ──────────────────── -->
 <div class="leave-modal-backdrop" id="leaveModal">
     <div class="leave-modal">
 
@@ -9,7 +9,7 @@
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
                     Date of filing is real-time
                 </div>
-                <h2 class="lm-title">New Leave Application</h2>
+                <h2 class="lm-title" id="lmModalTitle">New Leave Application</h2>
             </div>
             <button class="lm-close" onclick="closeLeaveModal()">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
@@ -17,6 +17,9 @@
         </div>
 
         <div class="lm-body">
+
+            <!-- Hidden field: tracks whether we are editing an existing application -->
+            <input type="hidden" id="lm_appID" value="">
 
             <!-- 6.A TYPE OF LEAVE -->
             <div class="lm-section">
@@ -151,7 +154,7 @@
             <button class="lm-btn-cancel" onclick="closeLeaveModal()">Close</button>
             <button class="lm-btn-submit" id="lmSubmitBtn" onclick="submitLeave()">
                 <span class="lm-spinner" id="lmSpinner"></span>
-                Submit Application
+                <span id="lmSubmitLabel">Submit Application</span>
             </button>
         </div>
 

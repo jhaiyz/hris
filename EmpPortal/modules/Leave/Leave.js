@@ -5,7 +5,7 @@ console.log("Leave module loaded");
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
 
-    const leaveModal = document.getElementById('leaveModal');
+    var leaveModal = document.getElementById('leaveModal');
 
     if (leaveModal) {
         leaveModal.addEventListener('click', function (e) {
@@ -18,23 +18,69 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ─────────────────────────────────────────────
-// MODAL
+// EDIT CLICK ENTRY POINT
+// Called via onclick="lmEditClick(this)" on the edit button.
+// Receives the button element as a real argument — avoids the
+// `this === window` trap in onclick="fn(this.dataset.x)".
 // ─────────────────────────────────────────────
-function openLeaveModal() {
+function lmEditClick(btn) {
+    var row = JSON.parse(btn.getAttribute('data-row'));
+    openLeaveModal(row);
+}
 
-    const modal = document.getElementById('leaveModal');
+// ─────────────────────────────────────────────
+// MODAL
+// openLeaveModal()      → new application
+// openLeaveModal(row)   → edit existing row
+// ─────────────────────────────────────────────
+function openLeaveModal(row) {
 
-    if (modal) {
-        modal.classList.add('show');
-        resetLeaveForm();
+    var modal = document.getElementById('leaveModal');
+    if (!modal) return;
+
+    resetLeaveForm();
+
+    if (row) {
+        // ── EDIT MODE ──────────────────────────────────
+        document.getElementById('lmModalTitle').textContent  = 'Modify Leave Application';
+        document.getElementById('lmSubmitLabel').textContent = 'Save Changes';
+        document.getElementById('lm_appID').value            = row.app_ID;
+
+        // Leave type dropdown
+        document.getElementById('lm_leaveType').value = row.lt_ID;
+
+        // Find the matching radio and check it
+        var radios = document.querySelectorAll('input[name="lm_detail"]');
+        radios.forEach(function (radio) {
+            if (radio.value === row.dol_b) {
+                radio.checked = true;
+
+                // Fill companion text input with dol_c
+                var radioRow    = radio.closest('.lm-radio-row');
+                var detailInput = radioRow ? radioRow.querySelector('.lm-detail-input') : null;
+                if (detailInput) {
+                    detailInput.value = row.dol_c || '';
+                }
+            }
+        });
+
+        document.getElementById('lm_nod').value   = row.nod;
+        document.getElementById('lm_dates').value = row.inclusive_dates;
+
+    } else {
+        // ── NEW MODE ───────────────────────────────────
+        document.getElementById('lmModalTitle').textContent  = 'New Leave Application';
+        document.getElementById('lmSubmitLabel').textContent = 'Submit Application';
+        document.getElementById('lm_appID').value            = '';
     }
+
+    modal.classList.add('show');
 
 }
 
 function closeLeaveModal() {
 
-    const modal = document.getElementById('leaveModal');
-
+    var modal = document.getElementById('leaveModal');
     if (modal) {
         modal.classList.remove('show');
     }
@@ -46,18 +92,19 @@ function closeLeaveModal() {
 // ─────────────────────────────────────────────
 function resetLeaveForm() {
 
+    document.getElementById('lm_appID').value     = '';
     document.getElementById('lm_leaveType').value = '';
 
-    document.querySelectorAll('input[name="lm_detail"]').forEach(r => {
+    document.querySelectorAll('input[name="lm_detail"]').forEach(function (r) {
         r.checked = false;
     });
 
-    document.querySelectorAll('.lm-detail-input').forEach(i => {
+    document.querySelectorAll('.lm-detail-input').forEach(function (i) {
         i.value = '';
         i.classList.remove('error');
     });
 
-    document.getElementById('lm_nod').value = '';
+    document.getElementById('lm_nod').value   = '';
     document.getElementById('lm_dates').value = '';
 
     lmHideAlert();
@@ -66,201 +113,265 @@ function resetLeaveForm() {
 }
 
 // ─────────────────────────────────────────────
-// ERRORS
+// ALERTS & ERRORS
 // ─────────────────────────────────────────────
 function lmClearErrors() {
-
-    document.querySelectorAll('.error').forEach(el => {
+    document.querySelectorAll('.error').forEach(function (el) {
         el.classList.remove('error');
     });
-
 }
 
-function lmShowAlert(msg, type = 'err') {
-
-    const el = document.getElementById('lmAlert');
-
-    el.textContent = msg;
-    el.className = 'lm-alert ' + type;
+function lmShowAlert(msg, type) {
+    type = type || 'err';
+    var el = document.getElementById('lmAlert');
+    el.textContent   = msg;
+    el.className     = 'lm-alert ' + type;
     el.style.display = 'block';
-
 }
 
 function lmHideAlert() {
-
-    const el = document.getElementById('lmAlert');
-
+    var el = document.getElementById('lmAlert');
     el.style.display = 'none';
-    el.className = 'lm-alert';
-
+    el.className     = 'lm-alert';
 }
 
 // ─────────────────────────────────────────────
-// SUBMIT
+// SUBMIT  (INSERT or UPDATE)
 // ─────────────────────────────────────────────
 async function submitLeave() {
 
     lmHideAlert();
     lmClearErrors();
 
-    let valid = true;
+    var valid = true;
 
-    const leaveType = document.getElementById('lm_leaveType').value;
-    const nod = document.getElementById('lm_nod').value;
-    const dates = document.getElementById('lm_dates').value.trim();
+    var appID     = document.getElementById('lm_appID').value;
+    var leaveType = document.getElementById('lm_leaveType').value;
+    var nod       = document.getElementById('lm_nod').value;
+    var dates     = document.getElementById('lm_dates').value.trim();
 
-    // Leave type
     if (!leaveType) {
-
         document.getElementById('lm_leaveType').classList.add('error');
         lmShowAlert('Please select leave type.');
         valid = false;
-
     }
 
-    // Radio
-    const selectedRadio = document.querySelector('input[name="lm_detail"]:checked');
+    var selectedRadio = document.querySelector('input[name="lm_detail"]:checked');
 
     if (!selectedRadio) {
-
-        if (valid) {
-            lmShowAlert('Please select leave details.');
-        }
-
+        if (valid) lmShowAlert('Please select leave details.');
         valid = false;
-
     }
 
-    // Detail input
-    let detailC = null;
+    var detailC = null;
 
     if (selectedRadio) {
+        var needsInput  = selectedRadio.dataset.needsInput === '1';
+        var radioRow    = selectedRadio.closest('.lm-radio-row');
+        var detailInput = radioRow ? radioRow.querySelector('.lm-detail-input') : null;
 
-        const needsInput = selectedRadio.dataset.needsInput === '1';
-
-        const row = selectedRadio.closest('.lm-radio-row');
-
-        const input = row ? row.querySelector('.lm-detail-input') : null;
-
-        if (needsInput && input) {
-
-            if (input.value.trim() === '') {
-
-                input.classList.add('error');
-
-                if (valid) {
-                    lmShowAlert('Please complete the required detail.');
-                }
-
+        if (needsInput && detailInput) {
+            if (detailInput.value.trim() === '') {
+                detailInput.classList.add('error');
+                if (valid) lmShowAlert('Please complete the required detail.');
                 valid = false;
-
             } else {
-
-                detailC = input.value.trim();
-
+                detailC = detailInput.value.trim();
             }
-
-        } else if (input) {
-
-            detailC = input.value.trim();
-
+        } else if (detailInput) {
+            detailC = detailInput.value.trim() || null;
         }
-
     }
 
-    // NOD
     if (!nod || parseFloat(nod) <= 0) {
-
         document.getElementById('lm_nod').classList.add('error');
-
-        if (valid) {
-            lmShowAlert('Invalid number of days.');
-        }
-
+        if (valid) lmShowAlert('Invalid number of days.');
         valid = false;
-
     }
 
-    // Dates
     if (!dates) {
-
         document.getElementById('lm_dates').classList.add('error');
-
-        if (valid) {
-            lmShowAlert('Inclusive dates required.');
-        }
-
+        if (valid) lmShowAlert('Inclusive dates required.');
         valid = false;
-
     }
 
     if (!valid) return;
 
-    // Group map
-    const groupMap = {
+    var groupMap = {
         vacation: 'In case of Vacation/Special Privelege Leave',
-        sick: 'In case of Sick Leave',
-        women: 'In case of Special Leave Benefits for Women',
-        study: 'In case of Study Leave',
-        other: 'Other purpose'
+        sick:     'In case of Sick Leave',
+        women:    'In case of Special Leave Benefits for Women',
+        study:    'In case of Study Leave',
+        other:    'Other purpose'
     };
 
-    const dolA = groupMap[selectedRadio.dataset.group] || '';
-    const dolB = selectedRadio.value;
+    var dolA = groupMap[selectedRadio.dataset.group] || '';
+    var dolB = selectedRadio.value;
 
-    // Button
-    const btn = document.getElementById('lmSubmitBtn');
-    const spinner = document.getElementById('lmSpinner');
-
-    btn.disabled = true;
+    var btn     = document.getElementById('lmSubmitBtn');
+    var spinner = document.getElementById('lmSpinner');
+    btn.disabled          = true;
     spinner.style.display = 'inline-block';
 
     try {
 
-        const payload = {
-            lt_ID: leaveType,
-            dol_a: dolA,
-            dol_b: dolB,
-            dol_c: detailC,
-            nod: parseFloat(nod),
+        var payload = {
+            app_ID:          appID ? parseInt(appID) : null,
+            lt_ID:           leaveType,
+            dol_a:           dolA,
+            dol_b:           dolB,
+            dol_c:           detailC,
+            nod:             parseFloat(nod),
             inclusive_dates: dates
         };
 
-        const res = await fetch('./modules/leave/submit-leave.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+        var res  = await fetch('./modules/leave/submit-leave.php', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
         });
 
-        const data = await res.json();
+        var data = await res.json();
 
         if (data.success) {
 
-            lmShowAlert('Leave application submitted successfully!', 'ok');
+            lmShowAlert(
+                appID ? 'Leave application updated successfully!' : 'Leave application submitted successfully!',
+                'ok'
+            );
 
-            setTimeout(() => {
-                closeLeaveModal();
-                location.reload();
-            }, 1200);
+            if (appID) {
+                lmPatchRow(data.row);
+            } else {
+                lmPrependRow(data.row);
+            }
+
+            setTimeout(closeLeaveModal, 1200);
 
         } else {
-
             lmShowAlert(data.message || 'Submission failed.');
-
         }
 
     } catch (err) {
-
         console.error(err);
-        lmShowAlert('Server error.');
-
+        lmShowAlert('Server error. Please try again.');
     } finally {
-
-        btn.disabled = false;
+        btn.disabled          = false;
         spinner.style.display = 'none';
+    }
 
+}
+
+// ─────────────────────────────────────────────
+// DOM HELPERS
+// ─────────────────────────────────────────────
+
+function lmStatusClass(status) {
+    if (status === 'Approved')    return 'status-approved';
+    if (status === 'Disapproved') return 'status-disapproved';
+    return 'status-pending';
+}
+
+function lmBuildActionCell(row) {
+
+    var isPending = (row.status === 'Pending Approval');
+
+    if (isPending) {
+        var encoded = JSON.stringify(row.edit_data)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;');
+        return '<div class="action-buttons">'
+            + '<button class="icon-btn btn-edit" data-row="' + encoded + '" onclick="lmEditClick(this)">✏️</button>'
+            + '<button class="icon-btn btn-delete" onclick="deleteLeave(' + row.app_ID + ')">🗑️</button>'
+            + '<button class="icon-btn btn-print">🖨️</button>'
+            + '</div>';
+    }
+
+    return '<div class="action-buttons">'
+        + '<button class="icon-btn btn-edit" disabled>✏️</button>'
+        + '<button class="icon-btn btn-delete" disabled>🗑️</button>'
+        + '<button class="icon-btn btn-print">🖨️</button>'
+        + '</div>';
+
+}
+
+function lmPatchRow(row) {
+
+    var tr = document.getElementById('leave-row-' + row.app_ID);
+    if (!tr) return;
+
+    tr.querySelector('td:nth-child(1)').innerHTML   = lmBuildActionCell(row);
+    tr.querySelector('td:nth-child(3)').textContent = row.leave_description;
+    tr.querySelector('td:nth-child(4)').textContent = row.nod;
+    tr.querySelector('td:nth-child(5)').textContent = row.inclusive_dates;
+    tr.querySelector('td:nth-child(6)').innerHTML   =
+        '<span class="status-chip ' + lmStatusClass(row.status) + '">' + row.status + '</span>';
+    tr.querySelector('td:nth-child(7)').textContent = row.remarks || '—';
+
+    tr.style.transition = 'background 0.4s';
+    tr.style.background = 'rgba(14,165,160,0.15)';
+    setTimeout(function () { tr.style.background = ''; }, 1400);
+
+}
+
+function lmPrependRow(row) {
+
+    var tbody = document.getElementById('leaveTableBody');
+    if (!tbody) return;
+
+    var tr = document.createElement('tr');
+    tr.id  = 'leave-row-' + row.app_ID;
+
+    tr.innerHTML =
+        '<td>' + lmBuildActionCell(row) + '</td>'
+        + '<td>' + row.dof_formatted + '<br><small>' + row.tof + '</small></td>'
+        + '<td>' + row.leave_description + '</td>'
+        + '<td>' + row.nod + '</td>'
+        + '<td>' + row.inclusive_dates + '</td>'
+        + '<td><span class="status-chip ' + lmStatusClass(row.status) + '">' + row.status + '</span></td>'
+        + '<td>' + (row.remarks || '—') + '</td>';
+
+    tbody.insertBefore(tr, tbody.firstChild);
+
+    tr.style.transition = 'background 0.4s';
+    tr.style.background = 'rgba(14,165,160,0.15)';
+    setTimeout(function () { tr.style.background = ''; }, 1400);
+
+}
+
+// ─────────────────────────────────────────────
+// DELETE
+// ─────────────────────────────────────────────
+async function deleteLeave(appID) {
+
+    if (!confirm('Are you sure you want to delete this leave application?')) return;
+
+    try {
+
+        var res  = await fetch('./modules/leave/delete-leave.php', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ app_ID: appID })
+        });
+
+        var data = await res.json();
+
+        if (data.success) {
+
+            var tr = document.getElementById('leave-row-' + appID);
+            if (tr) {
+                tr.style.transition = 'opacity 0.35s';
+                tr.style.opacity    = '0';
+                setTimeout(function () { tr.remove(); }, 380);
+            }
+
+        } else {
+            alert(data.message || 'Delete failed. Please try again.');
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert('Server error while deleting.');
     }
 
 }
