@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'db.php';
+require_once '../../db.php';  // ✅ goes up two levels to hris/EmpPortal/
 
 // --- Fetch leave record ---
 $app_ID = isset($_GET['app_ID']) ? (int)$_GET['app_ID'] : 0;
@@ -29,24 +29,28 @@ $sql = "
         a.lt_ID,
         l.Description AS LeaveDescription,
         e.emp_ID,
-        e.LastName,
-        e.FirstName,
-        e.MiddleName,
+        e.Last_Name,
+        e.First_Name,
+        e.Middle_Name,
+        e.Ext_Name,
         e.Position,
-        e.Salary,
-        e.Department,
-        e.VL_Balance,
-        e.SL_Balance
+        sg.Salary_Grade,
+        e.Office,
+        cc.cur_VL_Bal,
+        cc.less_VL_Bal,
+        cc.cur_SL_Bal,
+        cc.less_SL_Bal
     FROM tblappleave a
-    LEFT JOIN tbl_lt       l ON a.lt_ID   = l.lt_ID
-    LEFT JOIN tbl_employee e ON a.emp_ID  = e.emp_ID
+    LEFT JOIN tbl_lt       l  ON a.lt_ID  = l.lt_ID
+    LEFT JOIN tblemp e  ON a.emp_ID = e.emp_ID
+    LEFT JOIN tblsg        sg ON e.sg_ID  = sg.sg_ID
+    LEFT JOIN tblcolc      cc ON a.app_ID = cc.app_ID
     WHERE a.app_ID = ?
-      AND a.emp_ID = ?
     LIMIT 1
 ";
 
 $stmt = $db->prepare($sql);
-$stmt->bind_param('ii', $app_ID, $_SESSION['emp_ID']);
+$stmt->bind_param('i', $app_ID);
 $stmt->execute();
 $res  = $stmt->get_result();
 $row  = $res->fetch_assoc();
@@ -60,14 +64,27 @@ if (!$row) {
 // ---- helpers ----
 function val($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 
-$fullName   = val(trim($row['LastName'] . ', ' . $row['FirstName'] . ' ' . $row['MiddleName']));
-$position   = val($row['Position'] ?? '');
-$salary     = val($row['Salary']   ?? '');
-$department = val($row['Department'] ?? '');
+$extName    = trim($row['Ext_Name'] ?? '');
+$nameParts  = trim($row['Last_Name'] . ', ' . $row['First_Name'] . ' ' . $row['Middle_Name']);
+if ($extName) $nameParts .= ' ' . $extName;
+$fullName   = val($nameParts);
+$position   = val($row['Position']    ?? '');
+$salaryGrade = val($row['Salary_Grade'] ?? '');
+$department = val($row['Office']      ?? '');
 $dof        = $row['DOF'] ? date('F d, Y', strtotime($row['DOF'])) : '';
-$nod        = val($row['NOD'] ?? '');
+$nod        = val($row['NOD']         ?? '');
 $dates      = val($row['Inclusive_Dates'] ?? '');
 $leaveType  = val($row['LeaveDescription'] ?? '');
+
+// Leave credits from tblcolc
+$curVL   = val($row['cur_VL_Bal']  ?? '');
+$lessVL  = val($row['less_VL_Bal'] ?? '');
+$balVL   = (is_numeric($row['cur_VL_Bal'] ?? null) && is_numeric($row['less_VL_Bal'] ?? null))
+           ? val($row['cur_VL_Bal'] - $row['less_VL_Bal']) : '';
+$curSL   = val($row['cur_SL_Bal']  ?? '');
+$lessSL  = val($row['less_SL_Bal'] ?? '');
+$balSL   = (is_numeric($row['cur_SL_Bal'] ?? null) && is_numeric($row['less_SL_Bal'] ?? null))
+           ? val($row['cur_SL_Bal'] - $row['less_SL_Bal']) : '';
 
 // --- Map leave type to checkbox column ---
 $leaveMap = [
@@ -552,8 +569,8 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
           <span class="cell-value"><?= $position ?></span>
         </div>
         <div class="cell" style="flex:.8">
-          <span class="cell-label">5. SALARY</span>
-          <span class="cell-value"><?= $salary ?></span>
+          <span class="cell-label">5. SALARY GRADE</span>
+          <span class="cell-value"><?= $salaryGrade ?></span>
         </div>
       </div>
 
@@ -702,18 +719,18 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
             <tbody>
               <tr>
                 <td class="row-label">Total Earned</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
+                <td><?= $curVL ?></td>
+                <td><?= $curSL ?></td>
               </tr>
               <tr>
                 <td class="row-label">Less this application</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
+                <td><?= $lessVL ?></td>
+                <td><?= $lessSL ?></td>
               </tr>
               <tr>
                 <td class="row-label">Balance</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
+                <td><?= $balVL ?></td>
+                <td><?= $balSL ?></td>
               </tr>
             </tbody>
           </table>

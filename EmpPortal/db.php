@@ -17,7 +17,9 @@ function getDB() {
     return $conn;
 }
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();  // ✅ only starts if no session is active
+}
 
 function isLoggedIn() {
     return isset($_SESSION['emp_ID']) && !empty($_SESSION['emp_ID']);

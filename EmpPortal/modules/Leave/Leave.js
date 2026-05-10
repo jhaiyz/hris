@@ -411,7 +411,7 @@ async function confirmDeleteLeave() {
 
 function printLeave(appID) {
     window.open(
-        'leave_print.php?app_ID=' + appID,
+        'modules/leave/leave-print.php?app_ID=' + appID,
         'leave_print_' + appID,
         'width=870,height=960,scrollbars=yes,resizable=yes'
     );
