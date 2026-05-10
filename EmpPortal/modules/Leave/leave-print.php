@@ -27,6 +27,8 @@ $sql = "
         a.DOL_B,
         a.DOL_C,
         a.lt_ID,
+        a.COLC_By,
+        a.Approved_By,
         l.Description AS LeaveDescription,
         e.emp_ID,
         e.Last_Name,
@@ -36,6 +38,7 @@ $sql = "
         e.Position,
         sg.Salary_Grade,
         e.Office,
+        cc.As_Of,
         cc.cur_VL_Bal,
         cc.less_VL_Bal,
         cc.cur_SL_Bal,
@@ -191,9 +194,8 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   .form-header {
     display: grid;
     grid-template-columns: 110px 1fr 110px;
-    align-items: start;
+    align-items: stretch;
     border: 1.5px solid var(--black);
-    border-bottom: none;
   }
   .form-header .cs-num {
     padding: 5px 7px;
@@ -201,6 +203,20 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     font-size: 7pt;
     font-family: 'DM Mono', monospace;
     line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .form-header .cs-num .cs-label {
+    text-align: center;
+    font-size: 7pt;
+  }
+  .form-header .cs-num img.logo-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
   }
   .form-header .title-block {
     text-align: center;
@@ -221,6 +237,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     border-left: 1px solid var(--black);
     padding: 5px 7px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
   }
@@ -523,7 +540,8 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     <!-- HEADER -->
     <div class="form-header">
       <div class="cs-num">
-        Civil Service Form No. 6<br>Revised 2020
+        <img class="logo-img" src="../../modules/Leave/cdhlogo.jpg" alt="CDH Logo">
+        <span class="cs-label">Civil Service Form No. 6<br>Revised 2020</span>
       </div>
       <div class="title-block">
         <div class="agency">
@@ -534,12 +552,9 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
         <div class="form-title">APPLICATION FOR LEAVE</div>
       </div>
       <div class="logo-block">
-        <!-- Agency seal placeholder; swap <img> src if you have a logo file -->
-        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="28" cy="28" r="27" stroke="#1a3a6b" stroke-width="1.5" fill="none"/>
-          <circle cx="28" cy="28" r="20" stroke="#1a3a6b" stroke-width=".8" fill="none"/>
-          <text x="28" y="31" text-anchor="middle" font-size="7" fill="#1a3a6b" font-family="serif">SEAL</text>
-        </svg>
+        <div style="border: 1.5px dashed #888; padding: 8px 6px; text-align: center; font-size: 7pt; font-family: 'DM Mono', monospace; color: #555; line-height: 1.5; min-height: 60px; display: flex; align-items: center; justify-content: center;">
+          Stamp of Date<br>of Receipt
+        </div>
       </div>
     </div><!-- /form-header -->
 
@@ -680,22 +695,19 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
         <div class="comm-cell">
           <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:6px;">6.D &nbsp; COMMUTATION</div>
           <div class="chk-row">
-            <span class="chk-box <?= !$commutationRequested ? 'checked' : '' ?>"><?= !$commutationRequested ? '&#10003;' : '&nbsp;' ?></span>
+            <span class="chk-box">&nbsp;</span>
             <span>Not Requested</span>
           </div>
           <div class="chk-row" style="margin-top:4px;">
-            <span class="chk-box <?= $commutationRequested ? 'checked' : '' ?>"><?= $commutationRequested ? '&#10003;' : '&nbsp;' ?></span>
+            <span class="chk-box checked">&#10003;</span>
             <span>Requested</span>
           </div>
-        </div>
-      </div>
-
-      <!-- Applicant signature -->
-      <div class="sig-row">
-        <div class="sig-cell" style="flex:1;text-align:left;padding-left:20%;">
-          <div style="min-height:32px;"></div>
-          <div class="sig-line" style="width:80%;margin-left:0;"></div>
-          <div class="sig-label">(Signature of Applicant)</div>
+          <!-- Applicant signature inside commutation box -->
+          <div style="margin-top:14px;text-align:center;">
+            <div style="min-height:15px;"></div>
+            <div style="border-bottom:1px solid #000;width:90%;margin:0 auto 2px;"></div>
+            <div class="sig-label">(Signature of Applicant)</div>
+          </div>
         </div>
       </div>
 
@@ -734,11 +746,34 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
               </tr>
             </tbody>
           </table>
-          <!-- Certifying officer sig -->
-          <div style="margin-top:14px;text-align:center;">
-            <div class="sig-line" style="width:90%;margin:0 auto 2px;min-height:0;border-bottom:1px solid #000;"></div>
-            <div style="font-weight:600;font-size:8.5pt;text-transform:uppercase;letter-spacing:.03em;">REMEDIOS S. CARIAN, MPA</div>
-            <div class="sig-label">(Authorized Officer)</div>
+          <!-- Certifying officer signature -->
+          <div style="margin-top:5px;text-align:center;">
+              
+              <!-- Space for actual signature -->
+              <div style="height:20px;"></div>
+
+              <!-- Signature line -->
+              <div style="
+                  width:90%;
+                  margin:0 auto 4px;
+                  border-bottom:1px solid #000;
+              "></div>
+
+              <!-- Name -->
+              <div style="
+                  font-weight:600;
+                  font-size:8.5pt;
+                  text-transform:uppercase;
+                  letter-spacing:.03em;
+              ">
+                  REMEDIOS S. CARIAN, MPA
+              </div>
+
+              <!-- Label -->
+              <div class="sig-label">
+                  (Authorized Officer)
+              </div>
+
           </div>
         </div>
 
@@ -787,37 +822,43 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
 
       <!-- Chief / Head signature -->
       <div class="footer-sig-row">
-        <div class="footer-sig-col">
-          <span class="footer-sig-name">OLIVER D. LACAMBRA, MD, MHA, DPCP, FPSMS</span>
-          <div class="footer-sig-title">Chief of Hospital II / Head of Agency</div>
-        </div>
-        <div class="footer-sig-col">
-          <!-- status badge for record keeping -->
-          <?php
-            $s = $row['Status'] ?? '';
-            $bclass = 'pending';
-            if ($s === 'Approved') $bclass = 'approved';
-            elseif ($s === 'Disapproved') $bclass = 'disapproved';
-          ?>
-          <div style="margin-top:8px;">
-            <div class="cell-label">CURRENT STATUS</div>
-            <div class="status-banner <?= $bclass ?>" style="font-size:10pt;padding:6px;margin-top:4px;border:1px solid #999;border-radius:3px;">
-              <?= val($s) ?>
-            </div>
-            <?php if (!empty($row['Remarks'])): ?>
-            <div style="margin-top:6px;font-size:8pt;color:#444;">
-              <strong>Remarks:</strong> <?= val($row['Remarks']) ?>
-            </div>
-            <?php endif; ?>
+
+          <div class="footer-sig-col" style="
+              grid-column:1 / span 2;
+              border-right:none;
+              text-align:center;
+              padding:25px 10px 10px;
+          ">
+
+              <!-- Space for actual signature -->
+              <div style="height:30px;"></div>
+
+              <!-- Signature Line -->
+              <div style="
+                  width:70%;
+                  margin:0 auto 4px;
+                  border-bottom:1.5px solid #000;
+              "></div>
+
+              <!-- Name -->
+              <span class="footer-sig-name" style="
+                  border-top:none;
+                  margin-top:0;
+                  padding-top:0;
+                  display:block;
+              ">
+                  OLIVER D. LACAMBRA, MD, MHA, DPCP, FPSMS
+              </span>
+
           </div>
-        </div>
+
       </div>
 
     </div><!-- /form-body -->
 
     <!-- Footer note -->
     <div style="text-align:center;font-size:6.5pt;font-family:'DM Mono',monospace;color:#888;margin-top:6px;">
-      CS Form No. 6 | Revised 2020 &nbsp;|&nbsp; This is a system-generated document.
+      CS Form No. 6 | Revised 2020 &nbsp;|&nbsp; Document Number: CDH-0000
     </div>
 
   </div><!-- /form-paper -->
