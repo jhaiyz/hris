@@ -79,6 +79,11 @@ $nod        = val($row['NOD']         ?? '');
 $dates      = val($row['Inclusive_Dates'] ?? '');
 $leaveType  = val($row['LeaveDescription'] ?? '');
 
+// Certification / approval fields
+$asOf      = $row['As_Of'] ? date('F d, Y', strtotime($row['As_Of'])) : '';
+$colcBy    = val($row['COLC_By']     ?? '');
+$approvedBy = val($row['Approved_By'] ?? '');
+
 // Leave credits from tblcolc
 $curVL   = val($row['cur_VL_Bal']  ?? '');
 $lessVL  = val($row['less_VL_Bal'] ?? '');
@@ -719,7 +724,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
         <!-- 7A: Leave Credits -->
         <div class="action-col">
           <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:4px;">7.A &nbsp; CERTIFICATION OF LEAVE CREDITS</div>
-          <div style="font-size:8pt;margin-bottom:4px;">As of ___________________________</div>
+          <div style="font-size:8pt;margin-bottom:4px;">As of <?= $asOf ?: '___________________________' ?></div>
           <table class="credits-table">
             <thead>
               <tr>
@@ -766,12 +771,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
                   text-transform:uppercase;
                   letter-spacing:.03em;
               ">
-                  REMEDIOS S. CARIAN, MPA
-              </div>
-
-              <!-- Label -->
-              <div class="sig-label">
-                  (Authorized Officer)
+                  <?= $colcBy ?>
               </div>
 
           </div>
@@ -796,7 +796,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
           </div>
           <!-- Recommending sig -->
           <div style="margin-top:10px;text-align:center;">
-            <div class="sig-line" style="width:90%;margin:0 auto 2px;min-height:28px;border-bottom:1px solid #000;"></div>
+            <div class="sig-line" style="width:90%;margin:0 auto 2px;min-height:15px;border-bottom:1px solid #000;"></div>
             <div class="sig-label">(Authorized Officer)</div>
           </div>
         </div>
@@ -847,7 +847,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
                   padding-top:0;
                   display:block;
               ">
-                  OLIVER D. LACAMBRA, MD, MHA, DPCP, FPSMS
+                  <?= $approvedBy ?>
               </span>
 
           </div>
@@ -858,7 +858,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
 
     <!-- Footer note -->
     <div style="text-align:center;font-size:6.5pt;font-family:'DM Mono',monospace;color:#888;margin-top:6px;">
-      CS Form No. 6 | Revised 2020 &nbsp;|&nbsp; Document Number: CDH-0000
+       Document Number: CDH-0000
     </div>
 
   </div><!-- /form-paper -->
