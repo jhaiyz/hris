@@ -134,7 +134,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
 <title>Leave Application — CS Form No. 6</title>
 <style>
   /* ========================================================
-     PRINT-FIRST LAYOUT — A4 portrait
+     PRINT-FIRST LAYOUT — A4 portrait, single page fit
      ======================================================== */
   @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -142,7 +142,6 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
 
   :root {
     --black:  #0a0a0a;
-    --rule:   #555;
     --light:  #ccc;
     --bg:     #f7f6f2;
     --ink:    #111;
@@ -153,8 +152,8 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     background: var(--bg);
     font-family: 'Source Serif 4', Georgia, serif;
     color: var(--ink);
-    font-size: 9.5pt;
-    line-height: 1.35;
+    font-size: 7.5pt;
+    line-height: 1.25;
   }
 
   /* ---- Screen preview wrapper ---- */
@@ -162,21 +161,20 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 12px 48px;
-    gap: 20px;
+    padding: 16px 12px 32px;
+    gap: 14px;
   }
 
   .print-btn-bar {
     display: flex;
-    gap: 12px;
-    margin-bottom: 4px;
+    gap: 10px;
   }
   .print-btn-bar button {
-    padding: 10px 28px;
+    padding: 8px 22px;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     font-family: 'DM Mono', monospace;
-    font-size: 11pt;
+    font-size: 10pt;
     cursor: pointer;
     transition: background .15s;
   }
@@ -188,59 +186,66 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   /* ---- The A4 "paper" ---- */
   .form-paper {
     background: #fff;
-    width: 215mm;
-    min-height: 297mm;
-    padding: 12mm 14mm 14mm;
+    width: 210mm;
+    height: 297mm;
+    padding: 8mm 10mm 8mm;
     box-shadow: 0 4px 24px rgba(0,0,0,.18);
     position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ===== HEADER ===== */
   .form-header {
     display: grid;
-    grid-template-columns: 110px 1fr 110px;
+    grid-template-columns: 88px 1fr 88px;
     align-items: stretch;
     border: 1.5px solid var(--black);
+    flex-shrink: 0;
   }
   .form-header .cs-num {
-    padding: 5px 7px;
+    padding: 3px 5px;
     border-right: 1px solid var(--black);
-    font-size: 7pt;
+    font-size: 6pt;
     font-family: 'DM Mono', monospace;
-    line-height: 1.4;
+    line-height: 1.35;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 3px;
   }
   .form-header .cs-num .cs-label {
     text-align: center;
-    font-size: 7pt;
+    font-size: 6pt;
   }
   .form-header .cs-num img.logo-img {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
   }
   .form-header .title-block {
     text-align: center;
-    padding: 5px 8px;
+    padding: 4px 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   .form-header .title-block .agency {
-    font-size: 7.5pt;
-    line-height: 1.45;
+    font-size: 6.5pt;
+    line-height: 1.4;
   }
   .form-header .title-block .form-title {
-    font-size: 15pt;
+    font-size: 12pt;
     font-weight: 600;
     letter-spacing: .04em;
     color: var(--accent);
-    margin-top: 3px;
+    margin-top: 2px;
   }
   .form-header .logo-block {
     border-left: 1px solid var(--black);
-    padding: 5px 7px;
+    padding: 4px 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -250,23 +255,29 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   /* ===== GENERIC SECTION / CELL HELPERS ===== */
   .form-body {
     border: 1.5px solid var(--black);
+    border-top: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .row-band {
     display: flex;
     border-bottom: 1px solid var(--black);
+    flex-shrink: 0;
   }
   .row-band:last-child { border-bottom: none; }
 
   .cell {
-    padding: 3px 5px;
+    padding: 2px 4px;
     border-right: 1px solid var(--black);
     flex: 1;
   }
   .cell:last-child { border-right: none; }
 
   .cell-label {
-    font-size: 7pt;
+    font-size: 6pt;
     font-family: 'DM Mono', monospace;
     color: #444;
     letter-spacing: .02em;
@@ -274,9 +285,9 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     margin-bottom: 1px;
   }
   .cell-value {
-    font-size: 9.5pt;
+    font-size: 8pt;
     font-weight: 600;
-    min-height: 14px;
+    min-height: 11px;
     border-bottom: 1px solid var(--light);
     display: block;
     padding-bottom: 1px;
@@ -286,11 +297,12 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   .section-header {
     background: #e8e8e8;
     font-family: 'DM Mono', monospace;
-    font-size: 8pt;
-    font-weight: 500;
-    padding: 3px 6px;
+    font-size: 6.5pt;
+    font-weight: 600;
+    padding: 2px 5px;
     border-bottom: 1px solid var(--black);
     letter-spacing: .03em;
+    flex-shrink: 0;
   }
 
   /* ===== LEAVE TYPE / DETAILS GRID ===== */
@@ -298,20 +310,21 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-bottom: 1px solid var(--black);
+    flex-shrink: 0;
   }
   .ld-left {
     border-right: 1px solid var(--black);
-    padding: 4px 6px;
+    padding: 3px 5px;
   }
   .ld-right {
-    padding: 4px 6px;
+    padding: 3px 5px;
   }
   .ld-sub-label {
     font-family: 'DM Mono', monospace;
-    font-size: 7.5pt;
+    font-size: 6.5pt;
     color: #333;
     font-weight: 500;
-    margin: 4px 0 2px;
+    margin: 2px 0 1px;
     border-bottom: 1px dotted #aaa;
     padding-bottom: 1px;
   }
@@ -320,20 +333,20 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   .chk-row {
     display: flex;
     align-items: flex-start;
-    gap: 5px;
-    margin: 2px 0;
-    line-height: 1.3;
-    font-size: 8.5pt;
+    gap: 3px;
+    margin: 1px 0;
+    line-height: 1.25;
+    font-size: 7pt;
   }
   .chk-box {
-    width: 12px;
-    min-width: 12px;
-    height: 12px;
+    width: 9px;
+    min-width: 9px;
+    height: 9px;
     border: 1px solid var(--black);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 9pt;
+    font-size: 7pt;
     line-height: 1;
     flex-shrink: 0;
     margin-top: 1px;
@@ -347,10 +360,10 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   .fill-line {
     border-bottom: 1px solid var(--black);
     display: block;
-    min-height: 12px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    font-size: 8.5pt;
+    min-height: 9px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    font-size: 7pt;
     padding-bottom: 1px;
   }
 
@@ -359,53 +372,37 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-bottom: 1px solid var(--black);
+    flex-shrink: 0;
   }
   .nod-cell {
     border-right: 1px solid var(--black);
-    padding: 4px 6px;
+    padding: 3px 5px;
   }
-  .comm-cell { padding: 4px 6px; }
+  .comm-cell { padding: 3px 5px; }
 
   .nod-value-big {
-    font-size: 18pt;
+    font-size: 13pt;
     font-weight: 600;
     color: var(--accent);
     font-family: 'DM Mono', monospace;
-    letter-spacing: .06em;
+    letter-spacing: .04em;
     border-bottom: 1px solid var(--black);
     display: block;
-    min-height: 26px;
+    min-height: 18px;
     line-height: 1.1;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
   }
   .dates-value {
-    font-size: 8.5pt;
-    min-height: 12px;
+    font-size: 7.5pt;
+    min-height: 10px;
     border-bottom: 1px solid var(--black);
-    margin-top: 2px;
-    padding-bottom: 2px;
+    margin-top: 1px;
+    padding-bottom: 1px;
   }
 
-  /* ===== SIGNATURE ROW ===== */
-  .sig-row {
-    display: flex;
-    border-bottom: 1px solid var(--black);
-  }
-  .sig-cell {
-    flex: 1;
-    padding: 6px 6px 4px;
-    text-align: center;
-    border-right: 1px solid var(--black);
-  }
-  .sig-cell:last-child { border-right: none; }
-  .sig-line {
-    border-bottom: 1px solid var(--black);
-    margin: 0 auto 2px;
-    width: 75%;
-    min-height: 28px;
-  }
+  /* ===== SIGNATURE / LABEL ===== */
   .sig-label {
-    font-size: 7pt;
+    font-size: 6pt;
     font-family: 'DM Mono', monospace;
     color: #555;
     letter-spacing: .02em;
@@ -415,20 +412,22 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   .action-header {
     background: #d0d0d0;
     font-family: 'DM Mono', monospace;
-    font-size: 8pt;
+    font-size: 6.5pt;
     font-weight: 600;
-    padding: 3px 6px;
+    padding: 2px 5px;
     border-bottom: 1px solid var(--black);
     letter-spacing: .05em;
     text-transform: uppercase;
+    flex-shrink: 0;
   }
   .action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-bottom: 1px solid var(--black);
+    flex-shrink: 0;
   }
   .action-col {
-    padding: 4px 6px;
+    padding: 3px 5px;
     border-right: 1px solid var(--black);
   }
   .action-col:last-child { border-right: none; }
@@ -436,35 +435,34 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
   .credits-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 8.5pt;
-    margin-top: 4px;
+    font-size: 6.5pt;
+    margin-top: 2px;
   }
   .credits-table th {
     text-align: center;
     font-family: 'DM Mono', monospace;
-    font-size: 7.5pt;
+    font-size: 6pt;
     border: 1px solid var(--black);
-    padding: 2px 4px;
+    padding: 1px 3px;
     background: #f0f0f0;
   }
   .credits-table td {
     border: 1px solid var(--black);
-    padding: 3px 6px;
-    min-height: 16px;
+    padding: 2px 4px;
   }
   .credits-table .row-label {
-    font-size: 7.5pt;
+    font-size: 6pt;
     background: #f8f8f8;
   }
 
   .approved-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    min-height: 70px;
     border-bottom: 1px solid var(--black);
+    flex-shrink: 0;
   }
   .approved-col {
-    padding: 4px 6px;
+    padding: 3px 5px;
     border-right: 1px solid var(--black);
   }
   .approved-col:last-child { border-right: none; }
@@ -474,52 +472,35 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-top: 1px solid var(--black);
+    flex-shrink: 0;
   }
   .footer-sig-col {
-    padding: 6px 10px 4px;
+    padding: 4px 8px 3px;
     border-right: 1px solid var(--black);
     text-align: center;
   }
   .footer-sig-col:last-child { border-right: none; }
   .footer-sig-name {
     font-weight: 600;
-    font-size: 9pt;
+    font-size: 7.5pt;
     letter-spacing: .03em;
-    border-top: 1.5px solid var(--black);
-    padding-top: 3px;
-    margin-top: 30px;
+    border-top: 1px solid var(--black);
+    padding-top: 2px;
+    margin-top: 18px;
     display: block;
     text-transform: uppercase;
   }
-  .footer-sig-title {
-    font-size: 7pt;
-    color: #444;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* remarks / status banner */
-  .status-banner {
-    text-align: center;
-    padding: 3px 6px;
-    font-family: 'DM Mono', monospace;
-    font-size: 8pt;
-    border-bottom: 1px solid var(--black);
-    letter-spacing: .04em;
-  }
-  .status-banner.approved    { background: #d4edda; color: #155724; }
-  .status-banner.disapproved { background: #f8d7da; color: #721c24; }
-  .status-banner.pending     { background: #fff3cd; color: #856404; }
 
   /* ===== PRINT OVERRIDES ===== */
   @media print {
-    body { background: #fff; font-size: 9pt; }
-    .page-wrapper { padding: 0; }
+    body { background: #fff; }
+    .page-wrapper { padding: 0; background: #fff; }
     .print-btn-bar { display: none; }
     .form-paper {
-      width: 100%;
-      min-height: auto;
+      width: 210mm;
+      height: 297mm;
       box-shadow: none;
-      padding: 10mm 12mm 12mm;
+      padding: 8mm 10mm 8mm;
     }
     @page {
       size: A4 portrait;
@@ -781,7 +762,7 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
         <div class="action-col">
           <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:6px;">7.B &nbsp; RECOMMENDATION</div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
+             <span class="chk-box checked">&#10003;</span>
             <span>For approval</span>
           </div>
           <div class="chk-row" style="margin-top:5px;align-items:flex-start;">
@@ -802,63 +783,67 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
         </div>
       </div><!-- /7A+7B -->
 
-      <!-- 7C + 7D -->
-      <div class="approved-grid">
-        <div class="approved-col">
-          <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:5px;">7.C &nbsp; APPROVED FOR:</div>
-          <div style="font-size:8.5pt;line-height:1.8;">
-            ________ days with pay<br>
-            ________ days without pay<br>
-            ________ others (Specify) __________________________
-          </div>
+      <!-- 7C + 7D Combined -->
+<div style="padding:5px 8px; border-top:none;">
+
+    <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+    ">
+
+        <!-- 7C -->
+        <div>
+            <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:5px;">
+                7.C &nbsp; APPROVED FOR:
+            </div>
+
+            <div style="font-size:8.5pt;line-height:1.8;">
+                ________ days with pay<br>
+                ________ days without pay<br>
+                ________ others (Specify) __________________________
+            </div>
         </div>
-        <div class="approved-col">
-          <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:5px;">7.D &nbsp; DISAPPROVED DUE TO:</div>
-          <span class="fill-line"></span>
-          <span class="fill-line"></span>
-          <span class="fill-line"></span>
+
+        <!-- 7D -->
+        <div>
+            <div class="cell-label" style="font-size:8pt;font-weight:600;color:#111;margin-bottom:5px;">
+                7.D &nbsp; DISAPPROVED DUE TO:
+            </div>
+
+            <span class="fill-line"></span>
+            <span class="fill-line"></span>
+            <span class="fill-line"></span>
         </div>
-      </div>
 
-      <!-- Chief / Head signature -->
-      <div class="footer-sig-row">
+    </div>
 
-          <div class="footer-sig-col" style="
-              grid-column:1 / span 2;
-              border-right:none;
-              text-align:center;
-              padding:25px 10px 10px;
-          ">
+        <!-- Approving Authority -->
+        <div style="
+            text-align:center;
+            margin-top:25px;
+        ">
 
-              <!-- Space for actual signature -->
-              <div style="height:30px;"></div>
+            <div style="height:25px;"></div>
 
-              <!-- Signature Line -->
-              <div style="
-                  width:70%;
-                  margin:0 auto 4px;
-                  border-bottom:1.5px solid #000;
-              "></div>
+            <span class="footer-sig-name" style="
+                border-top:1.5px solid #000;
+                padding-top:3px;
+                display:inline-block;
+                min-width:320px;
+            ">
+                <?= $approvedBy ?>
+            </span>
 
-              <!-- Name -->
-              <span class="footer-sig-name" style="
-                  border-top:none;
-                  margin-top:0;
-                  padding-top:0;
-                  display:block;
-              ">
-                  <?= $approvedBy ?>
-              </span>
+        </div>
 
-          </div>
-
-      </div>
+    </div>
 
     </div><!-- /form-body -->
 
     <!-- Footer note -->
     <div style="text-align:center;font-size:6.5pt;font-family:'DM Mono',monospace;color:#888;margin-top:6px;">
-       Document Number: CDH-0000
+      Document Number: CDH-0000
     </div>
 
   </div><!-- /form-paper -->
