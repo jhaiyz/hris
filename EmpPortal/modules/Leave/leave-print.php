@@ -753,10 +753,10 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
             </tbody>
           </table>
           <!-- Certifying officer signature -->
-          <div style="margin-top:5px;text-align:center;">
+          <div style="margin: top 20px;px;text-align:center;">
               
               <!-- Space for actual signature -->
-              <div style="height:20px;"></div>
+              <div style="height:28px;"></div>
 
               <!-- Signature line -->
               <div style="
