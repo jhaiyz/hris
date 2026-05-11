@@ -686,7 +686,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         <div class="panel" id="panel-training-request">
             <div class="panel-placeholder">
                 <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg></div>
-                <h3>Training Requests</h3>
+                <h3>Training Requests (not yet available)</h3>
                 <p>Submit and monitor your training enrollment requests.</p>
             </div>
         </div>
@@ -695,7 +695,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         <div class="panel" id="panel-service-records">
             <div class="panel-placeholder">
                 <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.3C18 2.12 15.88 0 13.3 0c-1.3 0-2.4.5-3.2 1.6L12 4 9.9 1.6C9.1.5 8 0 6.7 0 4.1 0 2 2.12 2 4.7c0 .42.1.86.18 1.3H0v14c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg></div>
-                <h3>Service Records</h3>
+                <h3>Service Records (not yet available)</h3>
                 <p>View your complete employment history and service records.</p>
             </div>
         </div>
@@ -704,7 +704,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         <div class="panel" id="panel-coe">
             <div class="panel-placeholder">
                 <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zm-1 7l-3-3 1.41-1.41L12 13.17l4.59-4.58L18 10l-6 6z"/></svg></div>
-                <h3>Certificate of Employment</h3>
+                <h3>Certificate of Employment (not yet available)</h3>
                 <p>Request and download your certificate of employment.</p>
             </div>
         </div>
@@ -713,7 +713,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         <div class="panel" id="panel-payslip">
             <div class="panel-placeholder">
                 <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
-                <h3>PaySlip</h3>
+                <h3>PaySlip (not yet available)</h3>
                 <p>View and download your monthly payslips.</p>
             </div>
         </div>

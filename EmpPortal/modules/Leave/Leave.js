@@ -275,6 +275,7 @@ function lmStatusClass(status) {
 function lmBuildActionCell(row) {
 
     var isPending = (row.status === 'Pending Approval');
+    var printBtn = '<button class="icon-btn btn-print" onclick="printLeave(' + row.app_ID + ')" title="Print Leave Application">🖨️</button>';
 
     if (isPending) {
         var encoded = JSON.stringify(row.edit_data)
@@ -283,16 +284,15 @@ function lmBuildActionCell(row) {
         return '<div class="action-buttons">'
             + '<button class="icon-btn btn-edit" data-row="' + encoded + '" onclick="lmEditClick(this)">✏️</button>'
             + '<button class="icon-btn btn-delete" onclick="deleteLeave(' + row.app_ID + ')">🗑️</button>'
-            + '<button class="icon-btn btn-print">🖨️</button>'
+            + printBtn
             + '</div>';
     }
 
     return '<div class="action-buttons">'
         + '<button class="icon-btn btn-edit" disabled>✏️</button>'
         + '<button class="icon-btn btn-delete" disabled>🗑️</button>'
-        + '<button class="icon-btn btn-print">🖨️</button>'
+        + printBtn
         + '</div>';
-
 }
 
 function lmPatchRow(row) {
