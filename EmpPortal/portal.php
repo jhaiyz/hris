@@ -606,7 +606,6 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
             </button>
             <div>
                 <div class="page-title" id="pageTitle">Dashboard</div>
-                <div class="page-sub" id="pageDate"></div>
             </div>
         </div>
         <div class="topbar-right">
