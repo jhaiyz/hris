@@ -123,6 +123,26 @@ if (!$activeLeave) $activeLeave = 'others';
 $dol_c = strtolower($row['DOL_C'] ?? '');
 $commutationRequested = (strpos($dol_c, 'request') !== false);
 
+// DOL_A / DOL_B / DOL_C parsing for 6B checkboxes
+$dol_a_raw = trim($row['DOL_A'] ?? '');
+$dol_b_raw = trim($row['DOL_B'] ?? '');
+$dol_c_raw = trim($row['DOL_C'] ?? '');
+
+$isVacGroup   = stripos($dol_a_raw, 'Vacation') !== false || stripos($dol_a_raw, 'Special Privilege') !== false;
+$isSickGroup  = stripos($dol_a_raw, 'Sick') !== false;
+$isWomenGroup = stripos($dol_a_raw, 'Women') !== false;
+$isStudyGroup = stripos($dol_a_raw, 'Study') !== false;
+$isOtherGroup = stripos($dol_a_raw, 'Other') !== false;
+
+$isWithinPH   = $isVacGroup   && stripos($dol_b_raw, 'Within') !== false;
+$isAbroad     = $isVacGroup   && stripos($dol_b_raw, 'Abroad') !== false;
+$isInHospital = $isSickGroup  && stripos($dol_b_raw, 'In Hospital') !== false;
+$isOutPatient = $isSickGroup  && stripos($dol_b_raw, 'Out Patient') !== false;
+$isMastersDeg = $isStudyGroup && stripos($dol_b_raw, "Master") !== false;
+$isBarBoard   = $isStudyGroup && (stripos($dol_b_raw, 'BAR') !== false || stripos($dol_b_raw, 'Board') !== false);
+$isMonetize   = $isOtherGroup && stripos($dol_b_raw, 'Monetization') !== false;
+$isTerminal   = $isOtherGroup && stripos($dol_b_raw, 'Terminal') !== false;
+
 // Checkbox helper
 function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
 ?>
@@ -623,47 +643,47 @@ function chk($cond) { return $cond ? '&#10003;' : '&nbsp;'; }
 
           <div class="ld-sub-label">In case of Vacation / Special Privilege Leave:</div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
-            <span>Within the Philippines <span class="fill-line" style="display:inline-block;width:80px;vertical-align:bottom;"></span></span>
+            <span class="chk-box <?= $isWithinPH ? 'checked' : '' ?>"><?= chk($isWithinPH) ?></span>
+            <span>Within the Philippines <span class="fill-line" style="display:inline-block;width:80px;vertical-align:bottom;"><?= $isWithinPH ? val($dol_c_raw) : '' ?></span></span>
           </div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
-            <span>Abroad (Specify) <span class="fill-line" style="display:inline-block;width:90px;vertical-align:bottom;"></span></span>
+            <span class="chk-box <?= $isAbroad ? 'checked' : '' ?>"><?= chk($isAbroad) ?></span>
+            <span>Abroad (Specify) <span class="fill-line" style="display:inline-block;width:90px;vertical-align:bottom;"><?= $isAbroad ? val($dol_c_raw) : '' ?></span></span>
           </div>
 
           <div class="ld-sub-label" style="margin-top:8px;">In case of Sick Leave:</div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
-            <span>In Hospital (Specify Illness) <span class="fill-line" style="display:inline-block;width:60px;vertical-align:bottom;"></span></span>
+            <span class="chk-box <?= $isInHospital ? 'checked' : '' ?>"><?= chk($isInHospital) ?></span>
+            <span>In Hospital (Specify Illness) <span class="fill-line" style="display:inline-block;width:60px;vertical-align:bottom;"><?= $isInHospital ? val($dol_c_raw) : '' ?></span></span>
           </div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
-            <span>Out Patient (Specify Illness) <span class="fill-line" style="display:inline-block;width:58px;vertical-align:bottom;"></span></span>
+            <span class="chk-box <?= $isOutPatient ? 'checked' : '' ?>"><?= chk($isOutPatient) ?></span>
+            <span>Out Patient (Specify Illness) <span class="fill-line" style="display:inline-block;width:58px;vertical-align:bottom;"><?= $isOutPatient ? val($dol_c_raw) : '' ?></span></span>
           </div>
-          <span class="fill-line"></span>
+          <span class="fill-line"><?= ($isSickGroup && !$isInHospital && !$isOutPatient) ? val($dol_c_raw) : '' ?></span>
 
           <div class="ld-sub-label" style="margin-top:8px;">In case of Special Leave Benefits for Women:</div>
           <span style="font-size:8pt;">(Specify Illness)</span>
-          <span class="fill-line"></span>
+          <span class="fill-line"><?= $isWomenGroup ? val($dol_c_raw) : '' ?></span>
           <span class="fill-line"></span>
 
           <div class="ld-sub-label" style="margin-top:8px;">In case of Study Leave:</div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
+            <span class="chk-box <?= $isMastersDeg ? 'checked' : '' ?>"><?= chk($isMastersDeg) ?></span>
             <span>Completion of Master's Degree</span>
           </div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
+            <span class="chk-box <?= $isBarBoard ? 'checked' : '' ?>"><?= chk($isBarBoard) ?></span>
             <span>BAR / Board Examination Review</span>
           </div>
 
           <div class="ld-sub-label" style="margin-top:8px;">Other purpose:</div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
+            <span class="chk-box <?= $isMonetize ? 'checked' : '' ?>"><?= chk($isMonetize) ?></span>
             <span>Monetization of Leave Credits</span>
           </div>
           <div class="chk-row">
-            <span class="chk-box">&nbsp;</span>
+            <span class="chk-box <?= $isTerminal ? 'checked' : '' ?>"><?= chk($isTerminal) ?></span>
             <span>Terminal Leave</span>
           </div>
         </div><!-- /6B -->
