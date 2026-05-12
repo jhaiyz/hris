@@ -43,6 +43,66 @@ while ($lt = $resLT->fetch_assoc()) {
 $dbLT->close();
 ?>
 
+<style>
+/* ── Leave table: fixed layout so headers always align with their cells ── */
+.leave-table {
+    width: 100%;
+    table-layout: fixed;       /* key: columns honour the widths below */
+    border-collapse: collapse;
+}
+
+/* Per-column widths  (must total 100 %) */
+.leave-table th:nth-child(1),
+.leave-table td:nth-child(1) { width: 10%; }   /* Actions        */
+
+.leave-table th:nth-child(2),
+.leave-table td:nth-child(2) { width: 13%; }   /* Date Filed     */
+
+.leave-table th:nth-child(3),
+.leave-table td:nth-child(3) { width: 20%; }   /* Particulars    */
+
+.leave-table th:nth-child(4),
+.leave-table td:nth-child(4) { width: 9%;  }   /* No. of Days    */
+
+.leave-table th:nth-child(5),
+.leave-table td:nth-child(5) { width: 18%; }   /* Inclusive Dates*/
+
+.leave-table th:nth-child(6),
+.leave-table td:nth-child(6) { width: 13%; }   /* Status         */
+
+.leave-table th:nth-child(7),
+.leave-table td:nth-child(7) { width: 17%; }   /* Remarks        */
+
+/* Consistent alignment */
+.leave-table thead th {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.leave-table tbody td {
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;      /* long text wraps instead of blowing out */
+    overflow-wrap: break-word;
+}
+
+/* Left-align text-heavy columns */
+.leave-table tbody td:nth-child(3),   /* Particulars  */
+.leave-table tbody td:nth-child(7) {  /* Remarks      */
+    text-align: left;
+}
+
+/* Keep action buttons centred and on one line */
+.leave-table .action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+}
+</style>
+
 <div class="leave-card">
 
     <div class="leave-header">
