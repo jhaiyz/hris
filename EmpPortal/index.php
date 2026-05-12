@@ -720,11 +720,11 @@ if (isLoggedIn()) {
             <div class="form-grid cols-2" style="margin-bottom:16px;">
                 <div class="reg-field">
                     <label>Employee No.</label>
-                    <input type="text" id="reg_emp_no" placeholder="e.g. 2024-001">
+                    <input type="text" id="reg_emp_no" placeholder="e.g. CDH-2023-244">
                 </div>
                 <div class="reg-field">
                     <label>Nickname</label>
-                    <input type="text" id="reg_nickname" placeholder="e.g. Juan">
+                    <input type="text" id="reg_nickname" placeholder="e.g. TANGGOL">
                 </div>
             </div>
 
@@ -732,15 +732,15 @@ if (isLoggedIn()) {
             <div class="form-grid cols-4" style="margin-bottom:16px;">
                 <div class="reg-field span-2">
                     <label>First Name</label>
-                    <input type="text" id="reg_first" placeholder="First name">
+                    <input type="text" id="reg_first" placeholder="e.g. MARJOVIE">
                 </div>
                 <div class="reg-field">
                     <label>Middle Name</label>
-                    <input type="text" id="reg_middle" placeholder="Middle name">
+                    <input type="text" id="reg_middle" placeholder="e.g. POTACIO">
                 </div>
                 <div class="reg-field">
                     <label>Last Name</label>
-                    <input type="text" id="reg_last" placeholder="Last name">
+                    <input type="text" id="reg_last" placeholder="e.g. CATUIRAN">
                 </div>
             </div>
 
@@ -817,8 +817,8 @@ if (isLoggedIn()) {
 
             <div class="form-grid cols-1" style="margin-bottom:24px;">
                 <div class="reg-field">
-                    <label>Emergency Contact No. <span class="optional-tag">optional</span></label>
-                    <input type="text" id="reg_emergency" placeholder="e.g. 09XXXXXXXXX">
+                    <label>Contact Person Incase of Emergency <span class="optional-tag">optional</span></label>
+                    <input type="text" id="reg_emergency" placeholder="e.g. Chris P. Pata">
                 </div>
             </div>
 
@@ -988,8 +988,24 @@ async function doRegister() {
         if (!val) { showRegAlert(`⚠ ${label} is required.`); return; }
     }
 
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+        showRegAlert('⚠ Please enter a valid email address.');
+        return;
+    }
+
     // Build Full_Name
-    const fullName = lastName + ', ' + firstName + (extName ? ' ' + extName : '');
+    let fullName = lastName + ', ' + firstName;
+
+    if (middleName) {
+        fullName += ' ' + middleName;
+    }
+
+    if (extName) {
+        fullName += ' ' + extName;
+    }
 
     const btn     = document.getElementById('saveBtn');
     const spinner = document.getElementById('saveSpinner');

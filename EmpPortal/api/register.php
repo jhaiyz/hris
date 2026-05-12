@@ -16,9 +16,9 @@ if (!$data) {
     exit;
 }
 
-// Sanitize helper
+// Sanitize helper — trims and converts to uppercase
 function s($val) {
-    return isset($val) && $val !== '' ? trim($val) : null;
+    return isset($val) && $val !== '' ? strtoupper(trim($val)) : null;
 }
 
 $empNo       = s($data['Employee_No']);
@@ -76,10 +76,10 @@ function checkDuplicate($db, $field, $value, $label, &$duplicates) {
     $stmt->close();
 }
 
-checkDuplicate($db, 'Employee_No', $empNo,    'Employee No.',          $duplicates);
-checkDuplicate($db, 'Full_Name',   $fullName, 'Full Name',             $duplicates);
-checkDuplicate($db, 'Nick_Name',   $nickName, 'Nickname',              $duplicates);
-checkDuplicate($db, 'Email',       $email,    'Email Address',         $duplicates);
+checkDuplicate($db, 'Employee_No', $empNo,    'Employee No.',             $duplicates);
+checkDuplicate($db, 'Full_Name',   $fullName, 'Full Name',                $duplicates);
+checkDuplicate($db, 'Nick_Name',   $nickName, 'Nickname',                 $duplicates);
+checkDuplicate($db, 'Email',       $email,    'Email Address',            $duplicates);
 
 if (!empty($mobileNo)) {
     checkDuplicate($db, 'Mobile_No', $mobileNo, 'Mobile No.', $duplicates);
