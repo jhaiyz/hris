@@ -734,32 +734,45 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
             Application Leave
         </a>
 
-        <!-- Trainings with submenu -->
-        <a class="nav-item" onclick="toggleSubmenu('trainingSub',this)" href="#">
-            <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-            Trainings
+        <!-- Request with submenu -->
+        <a class="nav-item" onclick="toggleSubmenu('requestSub',this)" href="#">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>
+            Request
             <svg class="chevron" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
         </a>
-        <div class="nav-submenu" id="trainingSub">
-            <a class="nav-item" onclick="showPanel('training-request',this)" href="#">
-                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>
-                Request
+        <div class="nav-submenu" id="requestSub">
+            <a class="nav-item" onclick="showPanel('service-records',this)" href="#">
+                <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.3C18 2.12 15.88 0 13.3 0c-1.3 0-2.4.5-3.2 1.6L12 4 9.9 1.6C9.1.5 8 0 6.7 0 4.1 0 2 2.12 2 4.7c0 .42.1.86.18 1.3H0v14c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                Service Records
+            </a>
+            <a class="nav-item" onclick="showPanel('coe',this)" href="#">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zm-1 7l-3-3 1.41-1.41L12 13.17l4.59-4.58L18 10l-6 6z"/></svg>
+                Certificate of Employment
+            </a>
+            <a class="nav-item" onclick="showPanel('ctc-pds',this)" href="#">
+                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                CTC of PDS
+            </a>
+            <a class="nav-item" onclick="showPanel('payslip',this)" href="#">
+                <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                PaySlip
+            </a>
+            <a class="nav-item" onclick="showPanel('dtr',this)" href="#">
+                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+                DTR
             </a>
         </div>
 
-        <a class="nav-item" onclick="showPanel('service-records',this)" href="#">
-            <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.3C18 2.12 15.88 0 13.3 0c-1.3 0-2.4.5-3.2 1.6L12 4 9.9 1.6C9.1.5 8 0 6.7 0 4.1 0 2 2.12 2 4.7c0 .42.1.86.18 1.3H0v14c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-            Service Records
+        <div class="nav-label" style="margin-top:14px;">Info</div>
+
+        <a class="nav-item" onclick="showPanel('contact-us',this)" href="#">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            Contact Us
         </a>
 
-        <a class="nav-item" onclick="showPanel('coe',this)" href="#">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zm-1 7l-3-3 1.41-1.41L12 13.17l4.59-4.58L18 10l-6 6z"/></svg>
-            Certificate of Employment
-        </a>
-
-        <a class="nav-item" onclick="showPanel('payslip',this)" href="#">
-            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
-            PaySlip
+        <a class="nav-item" onclick="showPanel('about-us',this)" href="#">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            About Us
         </a>
     </nav>
 
@@ -878,12 +891,39 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
 
         <script src="modules/leave/leave.js?v=<?= time() ?>"></script>
 
-        <!-- TRAINING REQUEST -->
-        <div class="panel" id="panel-training-request">
+        <!-- CTC OF PDS -->
+        <div class="panel" id="panel-ctc-pds">
             <div class="panel-placeholder">
-                <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg></div>
-                <h3>Training Requests (not yet available)</h3>
-                <p>Submit and monitor your training enrollment requests.</p>
+                <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></div>
+                <h3>CTC of PDS (not yet available)</h3>
+                <p>Request a certified true copy of your Personal Data Sheet.</p>
+            </div>
+        </div>
+
+        <!-- DTR -->
+        <div class="panel" id="panel-dtr">
+            <div class="panel-placeholder">
+                <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg></div>
+                <h3>DTR (not yet available)</h3>
+                <p>View and download your Daily Time Records.</p>
+            </div>
+        </div>
+
+        <!-- CONTACT US -->
+        <div class="panel" id="panel-contact-us">
+            <div class="panel-placeholder">
+                <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+                <h3>Contact Us (not yet available)</h3>
+                <p>Get in touch with the HR department for assistance and inquiries.</p>
+            </div>
+        </div>
+
+        <!-- ABOUT US -->
+        <div class="panel" id="panel-about-us">
+            <div class="panel-placeholder">
+                <div class="ph-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div>
+                <h3>About Us (not yet available)</h3>
+                <p>Learn more about the organization and the HR Information System.</p>
             </div>
         </div>
 
@@ -956,10 +996,15 @@ document.getElementById('topDate').textContent = dateStr;
         document.querySelectorAll('.nav-item:not(.parent-active)').forEach(n => n.classList.remove('active'));
         if (el && !el.classList.contains('hamburger')) el.classList.add('active');
         const titles = {
-            dashboard: 'Dashboard', leave: 'Application Leave',
-            'training-request': 'Training — Request',
+            dashboard: 'Dashboard',
+            leave: 'Application Leave — Request',
             'service-records': 'Service Records',
-            coe: 'Certificate of Employment', payslip: 'PaySlip'
+            coe: 'Certificate of Employment',
+            'ctc-pds': 'CTC of PDS',
+            payslip: 'PaySlip',
+            dtr: 'Daily Time Record',
+            'contact-us': 'Contact Us',
+            'about-us': 'About Us'
         };
         document.getElementById('pageTitle').textContent = titles[id] || id;
         if (window.innerWidth <= 768) closeSidebar();
