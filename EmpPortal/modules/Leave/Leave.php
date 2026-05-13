@@ -217,7 +217,7 @@ $dbLT->close();
                    value="<?= htmlspecialchars($defaultTo) ?>">
 
             <button type="button" class="btn-filter"       onclick="leaveFilter()">Filter</button>
-            <button type="button" class="btn-filter-reset" onclick="leaveFilterReset()">Reset</button>
+            <button type="button" class="btn-filter-reset" onclick="leaveFilterReset()">Refresh</button>
         </div>
 
         <button class="btn-new-leave" onclick="openLeaveModal()">

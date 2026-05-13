@@ -10,16 +10,16 @@ $emp_ID = (int)$_SESSION['emp_ID'];
 $db = getDB();
 
 if ($action === 'fetch') {
-    // Fetch unread count + latest notifications (from HR only)
     $stmt = $db->prepare("
         SELECT
-            notif_ID,
+            notification_ID,
             Title,
             Status,
-            Is_Read,
+            is_Read,
             Created_At
         FROM tblnotification
-        WHERE Sender_ID = ?
+        WHERE sender_ID = ?
+          AND is_Read = 0
           AND Route = 'from hr'
         ORDER BY Created_At DESC
         LIMIT 30
@@ -31,12 +31,12 @@ if ($action === 'fetch') {
     $notifications = [];
     $unread = 0;
     while ($row = $result->fetch_assoc()) {
-        if ($row['Is_Read'] == 0) $unread++;
+        $unread++;
         $notifications[] = [
-            'id'         => (int)$row['notif_ID'],
+            'id'         => (int)$row['notification_ID'],
             'title'      => $row['Title'],
             'status'     => $row['Status'],
-            'is_read'    => (int)$row['Is_Read'],
+            'is_read'    => (int)$row['is_Read'],
             'created_at' => $row['Created_At'],
         ];
     }
@@ -50,13 +50,12 @@ if ($action === 'fetch') {
     ]);
 
 } elseif ($action === 'mark_read') {
-    // Mark a single notification as read
     $notif_id = (int)($_GET['id'] ?? 0);
     if ($notif_id > 0) {
         $stmt = $db->prepare("
             UPDATE tblnotification
-            SET Is_Read = 1
-            WHERE notif_ID = ? AND Sender_ID = ? AND Route = 'from hr'
+            SET is_Read = 1
+            WHERE notification_ID = ? AND sender_ID = ? AND Route = 'from hr'
         ");
         $stmt->bind_param('ii', $notif_id, $emp_ID);
         $stmt->execute();
@@ -66,11 +65,10 @@ if ($action === 'fetch') {
     echo json_encode(['success' => true]);
 
 } elseif ($action === 'mark_all_read') {
-    // Mark all notifications as read
     $stmt = $db->prepare("
         UPDATE tblnotification
-        SET Is_Read = 1
-        WHERE Sender_ID = ? AND Route = 'from hr' AND Is_Read = 0
+        SET is_Read = 1
+        WHERE sender_ID = ? AND Route = 'from hr' AND is_Read = 0
     ");
     $stmt->bind_param('i', $emp_ID);
     $stmt->execute();

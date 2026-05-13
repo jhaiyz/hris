@@ -944,11 +944,10 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
 </div>
 
 <script>
-    // ── Date ──
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-    document.getElementById('topDate').textContent = dateStr;
-    document.getElementById('pageDate').textContent = dateStr;
+// ── Date ──
+const now = new Date();
+const dateStr = now.toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+document.getElementById('topDate').textContent = dateStr;
 
     // ── Panel navigation ──
     function showPanel(id, el) {
@@ -1208,9 +1207,9 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         }
     });
 
-    // Initial load + poll every 30 seconds
+    // Initial load + poll every 60 seconds
     fetchNotifications();
-    notifPollTimer = setInterval(fetchNotifications, 30000);
+    notifPollTimer = setInterval(fetchNotifications, 60000);
 
     function updateAllAvatars(src) {
         const sidebarEl = document.getElementById('sidebarAvatar');
