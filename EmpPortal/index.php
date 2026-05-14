@@ -13,6 +13,7 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HRIS — Employee Login</title>
+    <link rel="icon" type="image/png" href="icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
@@ -663,8 +664,8 @@ if (isLoggedIn()) {
     <div class="alert alert-error" id="alertBox"></div>
 
     <div class="field">
-        <label>Full Name</label>
-        <input type="text" id="fullName" placeholder="Enter your full name" autocomplete="name">
+        <label>Nickname</label>
+        <input type="text" id="fullName" placeholder="Enter your nickname" autocomplete="nickname">
     </div>
 
     <div class="field">
@@ -889,7 +890,7 @@ async function doLogin() {
     const btn      = document.getElementById('loginBtn');
     const spinner  = document.getElementById('spinner');
 
-    if (!fullName || !password) { showAlert('Please enter your full name and password.'); return; }
+    if (!fullName || !password) { showAlert('Please enter your nickname and password.'); return; }
 
     btn.disabled = true;
     spinner.style.display = 'inline-block';
@@ -898,7 +899,7 @@ async function doLogin() {
         const res  = await fetch('api/login.php', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ full_name: fullName, password })
+            body:    JSON.stringify({ nick_name: fullName, password })
         });
         const data = await res.json();
 

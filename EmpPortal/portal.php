@@ -46,6 +46,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HRIS — Employee Portal</title>
+    <link rel="icon" type="image/png" href="icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -227,7 +228,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
             border-top: 1px solid var(--border);
         }
         .btn-logout {
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%; padding: 11px 14px;
             background: rgba(255,107,107,.08);
             border: 1px solid rgba(255,107,107,.2);
@@ -680,6 +681,10 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         @media (max-width: 480px) {
             .notif-dropdown { width: calc(100vw - 32px); right: -8px; }
         }
+        #up_office option, #up_emp_status option { background: #162338; color: #fff; }
+        #up_birthday::-webkit-calendar-picker-indicator { filter: invert(.5) sepia(1) saturate(2) hue-rotate(140deg); cursor: pointer; opacity: .6; }
+        #panel-update-profile-panel input:focus, #panel-update-profile-panel select:focus { border-color: var(--teal) !important; box-shadow: 0 0 0 3px rgba(14,165,160,.14) !important; }
+        #panel-change-password-panel input:focus { border-color: var(--teal) !important; box-shadow: 0 0 0 3px rgba(14,165,160,.14) !important; }
     </style>
 </head>
 <body>
@@ -764,6 +769,16 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         </div>
 
         <div class="nav-label" style="margin-top:14px;">Info</div>
+
+        <a class="nav-item" onclick="showPanel('change-password-panel',this)" href="#">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            Change Password
+        </a>
+
+        <a class="nav-item" onclick="showPanel('update-profile-panel',this)" href="#">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+            Update Profile
+        </a>
 
         <a class="nav-item" onclick="showPanel('contact-us',this)" href="#">
             <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
@@ -954,6 +969,205 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
             </div>
         </div>
 
+        <!-- CHANGE PASSWORD -->
+        <div class="panel" id="panel-change-password-panel">
+            <div style="max-width:520px;margin:0 auto;">
+                <div style="background:var(--navy2);border:1px solid var(--border);border-radius:20px;padding:38px 36px 34px;">
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px;">
+                        <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 18px rgba(14,165,160,.35);">
+                            <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:white;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--white);">Change Password</div>
+                            <div style="font-size:.78rem;color:var(--gray);margin-top:2px;">Update your account password</div>
+                        </div>
+                    </div>
+
+                    <div class="alert" id="cpAlert" style="padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:20px;display:none;"></div>
+
+                    <div class="field" style="margin-bottom:18px;">
+                        <label style="display:block;font-size:.73rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Current Password</label>
+                        <div class="pw-wrap" style="position:relative;">
+                            <input type="password" id="cp_current" placeholder="Enter current password" style="width:100%;padding:13px 42px 13px 15px;background:rgba(255,255,255,.05);border:1.5px solid rgba(138,154,181,.22);border-radius:11px;color:var(--white);font-family:'Sora',sans-serif;font-size:.9rem;outline:none;transition:border-color .25s,box-shadow .25s;">
+                            <button type="button" onclick="togglePwField('cp_current')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);padding:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+
+                    <div class="field" style="margin-bottom:18px;">
+                        <label style="display:block;font-size:.73rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">New Password</label>
+                        <div class="pw-wrap" style="position:relative;">
+                            <input type="password" id="cp_new" placeholder="Create a strong password" oninput="checkCpStrength()" style="width:100%;padding:13px 42px 13px 15px;background:rgba(255,255,255,.05);border:1.5px solid rgba(138,154,181,.22);border-radius:11px;color:var(--white);font-family:'Sora',sans-serif;font-size:.9rem;outline:none;transition:border-color .25s,box-shadow .25s;">
+                            <button type="button" onclick="togglePwField('cp_new')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);padding:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:8px;" id="cpStrengthBar">
+                            <div id="cps1" style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .3s;"></div>
+                            <div id="cps2" style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .3s;"></div>
+                            <div id="cps3" style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .3s;"></div>
+                            <div id="cps4" style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .3s;"></div>
+                        </div>
+                        <div id="cpStrengthLabel" style="font-size:.72rem;color:var(--gray);margin-top:4px;">Enter a password</div>
+                    </div>
+
+                    <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:13px 15px;margin-bottom:18px;">
+                        <div id="cpr1" style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--gray);margin-bottom:5px;transition:color .3s;"><div style="width:6px;height:6px;border-radius:50%;background:var(--gray);flex-shrink:0;transition:background .3s;" id="cpr1d"></div>At least 8 characters</div>
+                        <div id="cpr2" style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--gray);margin-bottom:5px;transition:color .3s;"><div style="width:6px;height:6px;border-radius:50%;background:var(--gray);flex-shrink:0;transition:background .3s;" id="cpr2d"></div>Contains uppercase letter</div>
+                        <div id="cpr3" style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--gray);margin-bottom:0;transition:color .3s;"><div style="width:6px;height:6px;border-radius:50%;background:var(--gray);flex-shrink:0;transition:background .3s;" id="cpr3d"></div>Contains a number</div>
+                    </div>
+
+                    <div class="field" style="margin-bottom:22px;">
+                        <label style="display:block;font-size:.73rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;">Confirm New Password</label>
+                        <div class="pw-wrap" style="position:relative;">
+                            <input type="password" id="cp_confirm" placeholder="Re-enter new password" style="width:100%;padding:13px 42px 13px 15px;background:rgba(255,255,255,.05);border:1.5px solid rgba(138,154,181,.22);border-radius:11px;color:var(--white);font-family:'Sora',sans-serif;font-size:.9rem;outline:none;transition:border-color .25s,box-shadow .25s;">
+                            <button type="button" onclick="togglePwField('cp_confirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);padding:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+
+                    <button onclick="doChangePassword()" id="cpSaveBtn" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--teal),#09bfb9);border:none;border-radius:11px;color:white;font-family:'Sora',sans-serif;font-size:.93rem;font-weight:600;cursor:pointer;transition:transform .18s,box-shadow .18s,opacity .18s;box-shadow:0 6px 22px rgba(14,165,160,.35);">Update Password</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPDATE PROFILE -->
+        <div class="panel" id="panel-update-profile-panel">
+            <div style="max-width:820px;margin:0 auto;">
+                <div style="background:var(--navy2);border:1px solid var(--border);border-radius:20px;overflow:hidden;">
+                    <!-- Header -->
+                    <div style="background:linear-gradient(135deg,rgba(14,165,160,.15),rgba(6,214,160,.08));border-bottom:1px solid var(--border);padding:26px 32px;display:flex;align-items:center;gap:16px;">
+                        <div style="width:50px;height:50px;background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 18px rgba(14,165,160,.35);">
+                            <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:white;"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--white);">Update Profile</div>
+                            <div style="font-size:.78rem;color:var(--gray);margin-top:2px;">Edit your personal and employment information</div>
+                        </div>
+                    </div>
+
+                    <div style="padding:28px 32px 32px;">
+
+                        <!-- Personal Info Section -->
+                        <div style="font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(14,165,160,.15);">Personal Information</div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Employee No.</label>
+                                <input type="text" id="up_emp_no" readonly style="width:100%;padding:11px 13px;background:rgba(255,255,255,.03);border:1.5px solid rgba(138,154,181,.12);border-radius:10px;color:rgba(138,154,181,.6);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;cursor:not-allowed;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Nickname</label>
+                                <input type="text" id="up_nickname" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;">
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">First Name</label>
+                                <input type="text" id="up_first" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Middle Name</label>
+                                <input type="text" id="up_middle" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Last Name</label>
+                                <input type="text" id="up_last" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;">
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Extension Name <span style="font-size:.62rem;font-weight:400;color:rgba(138,154,181,.5);background:rgba(138,154,181,.08);border:1px solid rgba(138,154,181,.15);border-radius:4px;padding:1px 5px;">optional</span></label>
+                                <input type="text" id="up_ext" placeholder="e.g. JR, SR, III" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Birthday</label>
+                                <input type="date" id="up_birthday" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                        </div>
+
+                        <!-- Employment -->
+                        <div style="font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(14,165,160,.15);">Employment Details</div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Office</label>
+                                <select id="up_office" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%238a9ab5'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;transition:border-color .2s;">
+                                    <option value="">— Select Office —</option>
+                                    <?php
+                                        $dbOff = getDB();
+                                        $resOff = $dbOff->query("SELECT Office FROM tbloffice ORDER BY Office");
+                                        if ($resOff) {
+                                            while ($rowOff = $resOff->fetch_assoc()) {
+                                                echo '<option value="'.htmlspecialchars($rowOff['Office']).'">'.htmlspecialchars($rowOff['Office']).'</option>';
+                                            }
+                                        }
+                                        $dbOff->close();
+                                    ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Employment Status</label>
+                                <select id="up_emp_status" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%238a9ab5'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;transition:border-color .2s;">
+                                    <option value="">— Select Status —</option>
+                                    <option value="PERMANENT">PERMANENT</option>
+                                    <option value="JOB ORDER">JOB ORDER</option>
+                                    <option value="CONTRACT OF SERVICE">CONTRACT OF SERVICE</option>
+                                    <option value="CONTRACTUAL">CONTRACTUAL</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:22px;">
+                            <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Position</label>
+                            <input type="text" id="up_position" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                        </div>
+
+                        <!-- Contact -->
+                        <div style="font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(14,165,160,.15);">Contact Information</div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Mobile No. <span style="font-size:.62rem;font-weight:400;color:rgba(138,154,181,.5);background:rgba(138,154,181,.08);border:1px solid rgba(138,154,181,.15);border-radius:4px;padding:1px 5px;">optional</span></label>
+                                <input type="text" id="up_mobile" placeholder="09XXXXXXXXX" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Email Address</label>
+                                <input type="email" id="up_email" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:22px;">
+                            <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">Emergency Contact <span style="font-size:.62rem;font-weight:400;color:rgba(138,154,181,.5);background:rgba(138,154,181,.08);border:1px solid rgba(138,154,181,.15);border-radius:4px;padding:1px 5px;">optional</span></label>
+                            <input type="text" id="up_emergency" placeholder="e.g. Chris P. Pata" style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                        </div>
+
+                        <!-- Credentials -->
+                        <div style="font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(14,165,160,.15);">Professional Credentials <span style="font-size:.65rem;font-weight:400;letter-spacing:.05em;color:rgba(138,154,181,.5);text-transform:none;">(optional)</span></div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;">
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">PRC No. <span style="font-size:.62rem;font-weight:400;color:rgba(138,154,181,.5);background:rgba(138,154,181,.08);border:1px solid rgba(138,154,181,.15);border-radius:4px;padding:1px 5px;text-transform:none;">optional</span></label>
+                                <input type="text" id="up_prc" placeholder="PRC License No." style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin-bottom:6px;">PhilHealth Accreditation <span style="font-size:.62rem;font-weight:400;color:rgba(138,154,181,.5);background:rgba(138,154,181,.08);border:1px solid rgba(138,154,181,.15);border-radius:4px;padding:1px 5px;text-transform:none;">optional</span></label>
+                                <input type="text" id="up_ph_accred" placeholder="PH Accreditation No." style="width:100%;padding:11px 13px;background:rgba(255,255,255,.04);border:1.5px solid rgba(138,154,181,.18);border-radius:10px;color:var(--white);font-family:'Sora',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;">
+                            </div>
+                        </div>
+
+                        <div class="alert" id="upAlert" style="padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:14px;display:none;"></div>
+
+                        <div style="display:flex;gap:12px;">
+                            <button onclick="showPanel('dashboard', null)" style="flex:1;padding:13px;background:rgba(255,255,255,.06);border:1.5px solid rgba(138,154,181,.2);border-radius:10px;color:var(--gray);font-family:'Sora',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:background .2s;">Cancel</button>
+                            <button onclick="doUpdateProfile()" id="upSaveBtn" style="flex:2;padding:13px;background:linear-gradient(135deg,var(--teal),#09bfb9);border:none;border-radius:10px;color:white;font-family:'Sora',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .18s,box-shadow .18s,opacity .18s;box-shadow:0 6px 20px rgba(14,165,160,.35);">
+                                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div><!-- end .content -->
 </main>
 
@@ -986,7 +1200,12 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
 <script>
 // ── Date ──
 const now = new Date();
-const dateStr = now.toLocaleDateString('en-PH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const dayName = days[now.getDay()];
+const mm = String(now.getMonth()+1).padStart(2,'0');
+const dd = String(now.getDate()).padStart(2,'0');
+const yyyy = now.getFullYear();
+const dateStr = `${dayName}, ${mm}/${dd}/${yyyy}`;
 document.getElementById('topDate').textContent = dateStr;
 
     // ── Panel navigation ──
@@ -1004,10 +1223,17 @@ document.getElementById('topDate').textContent = dateStr;
             payslip: 'PaySlip',
             dtr: 'Daily Time Record',
             'contact-us': 'Contact Us',
-            'about-us': 'About Us'
+            'about-us': 'About Us',
+            'change-password-panel': 'Change Password',
+            'update-profile-panel': 'Update Profile'
         };
         document.getElementById('pageTitle').textContent = titles[id] || id;
         if (window.innerWidth <= 768) closeSidebar();
+        if (id === 'update-profile-panel') loadProfileData();
+        const upAlert = document.getElementById('upAlert');
+        if (upAlert) upAlert.style.display = 'none';
+        const cpAlert = document.getElementById('cpAlert');
+        if (cpAlert) cpAlert.style.display = 'none';
     }
 
     function toggleSubmenu(id, el) {
@@ -1266,6 +1492,153 @@ document.getElementById('topDate').textContent = dateStr;
             sidebarPh.replaceWith(img);
         }
     }
+
+    // ── CHANGE PASSWORD PANEL ────────────────────────────────
+    function togglePwField(id) {
+        const el = document.getElementById(id);
+        if (el) el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    function checkCpStrength() {
+        const pw = document.getElementById('cp_new').value;
+        const segs = ['cps1','cps2','cps3','cps4'].map(id => document.getElementById(id));
+        const label = document.getElementById('cpStrengthLabel');
+        const ok1 = pw.length >= 8;
+        const ok2 = /[A-Z]/.test(pw);
+        const ok3 = /[0-9]/.test(pw);
+        const setReq = (id, did, ok) => {
+            const el = document.getElementById(id);
+            const dot = document.getElementById(did);
+            if (el) el.style.color = ok ? 'var(--teal2)' : 'var(--gray)';
+            if (dot) dot.style.background = ok ? 'var(--teal2)' : 'var(--gray)';
+        };
+        setReq('cpr1','cpr1d',ok1); setReq('cpr2','cpr2d',ok2); setReq('cpr3','cpr3d',ok3);
+        const score = [ok1,ok2,ok3].filter(Boolean).length + (pw.length > 0 ? 0 : 0);
+        const colors = ['#ff6b6b','#f5c842','#0ea5a0','#06d6a0'];
+        const labels = ['Weak','Fair','Good','Strong'];
+        const s = [ok1,ok2,ok3,pw.length >= 12].filter(Boolean).length;
+        segs.forEach((seg, i) => { if (seg) seg.style.background = i < s ? colors[s-1] : 'rgba(255,255,255,.1)'; });
+        if (label) { label.textContent = pw.length ? (labels[s-1] || 'Weak') : 'Enter a password'; label.style.color = pw.length ? colors[s-1] : 'var(--gray)'; }
+    }
+
+    function showCpAlert(msg, type='error') {
+        const el = document.getElementById('cpAlert');
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+        if (type === 'error') { el.style.background='rgba(255,107,107,.12)'; el.style.border='1px solid rgba(255,107,107,.35)'; el.style.color='#ff9a9a'; }
+        else { el.style.background='rgba(6,214,160,.1)'; el.style.border='1px solid rgba(6,214,160,.35)'; el.style.color='#06d6a0'; }
+    }
+
+    async function doChangePassword() {
+        const current = document.getElementById('cp_current').value;
+        const newPw   = document.getElementById('cp_new').value;
+        const confirm = document.getElementById('cp_confirm').value;
+        const btn = document.getElementById('cpSaveBtn');
+        if (!current || !newPw || !confirm) { showCpAlert('Please fill in all fields.'); return; }
+        if (newPw !== confirm) { showCpAlert('New passwords do not match.'); return; }
+        if (newPw.length < 8) { showCpAlert('Password must be at least 8 characters.'); return; }
+        if (newPw === '123456') { showCpAlert('You cannot use the default password.'); return; }
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+            const res = await fetch('api/change-password.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ current_password: current, new_password: newPw }) });
+            const data = await res.json();
+            if (data.success) {
+                showCpAlert('Password updated successfully! Redirecting to dashboard…', 'success');
+                setTimeout(() => {
+                    // Clear the form fields
+                    document.getElementById('cp_current').value = '';
+                    document.getElementById('cp_new').value = '';
+                    document.getElementById('cp_confirm').value = '';
+                    checkCpStrength();
+                    // Navigate back to dashboard
+                    const dashNav = document.querySelector('.nav-item[onclick*="dashboard"]');
+                    showPanel('dashboard', dashNav);
+                    if (dashNav) dashNav.classList.add('active');
+                }, 1500);
+            } else { showCpAlert(data.message || 'Failed to update password.'); }
+        } catch(e) { showCpAlert('Server error. Please try again.'); }
+        finally { btn.disabled = false; btn.textContent = 'Update Password'; }
+    }
+
+    // ── UPDATE PROFILE PANEL ─────────────────────────────────
+    async function loadProfileData() {
+        try {
+            const res = await fetch('api/get-profile.php');
+            const data = await res.json();
+            if (!data.success) return;
+            const p = data.profile;
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setVal('up_emp_no',    p.Employee_No);
+            setVal('up_nickname',  p.Nick_Name);
+            setVal('up_first',     p.First_Name);
+            setVal('up_middle',    p.Middle_Name);
+            setVal('up_last',      p.Last_Name);
+            setVal('up_ext',       p.Ext_Name);
+            setVal('up_birthday',  p.Birthday);
+            setVal('up_office',    p.Office);
+            setVal('up_emp_status',p.Employment_Status);
+            setVal('up_position',  p.Position);
+            setVal('up_mobile',    p.Mobile_No);
+            setVal('up_email',     p.Email);
+            setVal('up_emergency', p.CP_Emergency);
+            setVal('up_prc',       p.PRC_No);
+            setVal('up_ph_accred', p.PH_Accred);
+        } catch(e) { console.error('Failed to load profile', e); }
+    }
+
+    function showUpAlert(msg, type='error') {
+        const el = document.getElementById('upAlert');
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+        if (type === 'error') { el.style.background='rgba(255,107,107,.12)'; el.style.border='1px solid rgba(255,107,107,.35)'; el.style.color='#ff9a9a'; }
+        else { el.style.background='rgba(6,214,160,.1)'; el.style.border='1px solid rgba(6,214,160,.35)'; el.style.color='#06d6a0'; }
+    }
+
+    async function doUpdateProfile() {
+        const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+        const nickname  = g('up_nickname');
+        const firstName = g('up_first');
+        const lastName  = g('up_last');
+        const birthday  = g('up_birthday');
+        const office    = g('up_office');
+        const empStatus = g('up_emp_status');
+        const position  = g('up_position');
+        const email     = g('up_email');
+        if (!nickname || !firstName || !lastName || !birthday || !office || !empStatus || !position || !email) {
+            showUpAlert('Please fill in all required fields.'); return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showUpAlert('Please enter a valid email address.'); return; }
+        const btn = document.getElementById('upSaveBtn');
+        btn.disabled = true;
+        try {
+            const res = await fetch('api/update-profile.php', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    Nick_Name: nickname, First_Name: firstName,
+                    Middle_Name: g('up_middle'), Last_Name: lastName,
+                    Ext_Name: g('up_ext'), Birthday: birthday,
+                    Office: office, Employment_Status: empStatus,
+                    Position: position, Mobile_No: g('up_mobile'),
+                    Email: email, CP_Emergency: g('up_emergency'),
+                    PRC_No: g('up_prc'), PH_Accred: g('up_ph_accred')
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showUpAlert('Profile updated successfully! Redirecting to dashboard…', 'success');
+                if (data.full_name) document.querySelector('.emp-name').textContent = data.full_name;
+                setTimeout(() => {
+                    const dashNav = document.querySelector('.nav-item[onclick*="dashboard"]');
+                    showPanel('dashboard', dashNav);
+                    if (dashNav) dashNav.classList.add('active');
+                }, 1500);
+            } else { showUpAlert(data.message || 'Failed to update profile.'); }
+        } catch(e) { showUpAlert('Server error. Please try again.'); }
+        finally { btn.disabled = false; }
+    }
+
 </script>
 </body>
 </html>
