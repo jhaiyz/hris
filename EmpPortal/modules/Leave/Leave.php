@@ -69,61 +69,6 @@ $dbLT->close();
 ?>
 
 <style>
-/* ── Leave table ──────────────────────────────────────────────────────────── */
-.leave-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-}
-
-.leave-table th:nth-child(1), .leave-table td:nth-child(1) { width: 10%; }
-.leave-table th:nth-child(2), .leave-table td:nth-child(2) { width: 13%; }
-.leave-table th:nth-child(3), .leave-table td:nth-child(3) { width: 20%; }
-.leave-table th:nth-child(4), .leave-table td:nth-child(4) { width: 9%;  }
-.leave-table th:nth-child(5), .leave-table td:nth-child(5) { width: 18%; }
-.leave-table th:nth-child(6), .leave-table td:nth-child(6) { width: 13%; }
-.leave-table th:nth-child(7), .leave-table td:nth-child(7) { width: 17%; }
-
-.leave-table thead th {
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-}
-
-.leave-table tbody td {
-    text-align: center;
-    vertical-align: middle;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.leave-table tbody td:nth-child(3),
-.leave-table tbody td:nth-child(7) { text-align: left; }
-
-.leave-table .action-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: nowrap;
-}
-
-/* ── Status chips ─────────────────────────────────────────────────────────── */
-.status-chip {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.status-pending       { background:#ffe5e5; color:#c0392b; border:1px solid #e74c3c; }
-.status-hr-approved   { background:#fff3e0; color:#e67e22; border:1px solid #f39c12; }
-.status-mgmt-approved { background:#e0f7fa; color:#00838f; border:1px solid #00acc1; }
-.status-approved      { background:#e6f9ee; color:#27ae60; border:1px solid #2ecc71; }
-.status-disapproved   { background:#f2f2f2; color:#7f8c8d; border:1px solid #bdc3c7; }
-
 /* ── Header & filter bar ──────────────────────────────────────────────────── */
 .leave-header {
     display: flex;
@@ -146,27 +91,29 @@ $dbLT->close();
 .leave-filter-bar label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #555;
+    color: #8a9ab5;
     white-space: nowrap;
 }
 
 .leave-filter-bar input[type="date"] {
     padding: 5px 8px;
-    border: 1px solid #ccc;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(138,154,181,.25);
     border-radius: 6px;
+    color: #fff;
     font-size: 0.85rem;
     cursor: pointer;
 }
 
 .leave-filter-bar input[type="date"]:focus {
     outline: none;
-    border-color: #4a90d9;
-    box-shadow: 0 0 0 2px rgba(74,144,217,.2);
+    border-color: #0ea5a0;
+    box-shadow: 0 0 0 2px rgba(14,165,160,.2);
 }
 
 .btn-filter {
     padding: 5px 14px;
-    background: #4a90d9;
+    background: #0ea5a0;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -176,13 +123,13 @@ $dbLT->close();
     white-space: nowrap;
     transition: background .2s;
 }
-.btn-filter:hover { background: #2f78c5; }
+.btn-filter:hover { background: #09bfb9; }
 
 .btn-filter-reset {
     padding: 5px 14px;
-    background: #eee;
-    color: #555;
-    border: 1px solid #ccc;
+    background: rgba(255,255,255,.06);
+    color: #8a9ab5;
+    border: 1px solid rgba(138,154,181,.25);
     border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -190,14 +137,155 @@ $dbLT->close();
     white-space: nowrap;
     transition: background .2s;
 }
-.btn-filter-reset:hover { background: #ddd; }
+.btn-filter-reset:hover { background: rgba(255,255,255,.1); color: #d4e4f7; }
 
 .leave-loading {
     text-align: center;
     padding: 20px;
-    color: #888;
+    color: #8a9ab5;
     font-size: 0.9rem;
     display: none;
+}
+
+/* ── Status chips ─────────────────────────────────────────────────────────── */
+.status-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-pending       { background: rgba(245,200,66,.13);  color: #f5c842; border: 1px solid rgba(245,200,66,.3);  }
+.status-hr-approved   { background: rgba(255,167,38,.13);  color: #ffa726; border: 1px solid rgba(255,167,38,.3);  }
+.status-mgmt-approved { background: rgba(38,198,218,.13);  color: #26c6da; border: 1px solid rgba(38,198,218,.3);  }
+.status-approved      { background: rgba(6,214,160,.13);   color: #06d6a0; border: 1px solid rgba(6,214,160,.3);   }
+.status-disapproved   { background: rgba(255,107,107,.13); color: #ff8d8d; border: 1px solid rgba(255,107,107,.3); }
+
+/* ── Leave card list ──────────────────────────────────────────────────────── */
+.leave-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 0 8px;
+}
+
+.leave-item {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(14,165,160,.14);
+    border-radius: 14px;
+    padding: 16px 18px;
+    transition: border-color .2s, background .2s;
+    position: relative;
+}
+.leave-item:hover {
+    background: rgba(14,165,160,.05);
+    border-color: rgba(14,165,160,.28);
+}
+
+/* Top row: particulars + status badge */
+.leave-item-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.leave-item-type {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #d4e4f7;
+    line-height: 1.3;
+}
+
+/* Meta row: date filed, days, inclusive dates */
+.leave-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-bottom: 10px;
+}
+
+.leave-meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .78rem;
+    color: #8a9ab5;
+}
+
+.leave-meta-pill span.meta-icon {
+    font-size: .85rem;
+    opacity: .7;
+}
+
+.leave-meta-pill strong {
+    color: #b8cde4;
+    font-weight: 600;
+}
+
+/* Remarks row */
+.leave-item-remarks {
+    font-size: .8rem;
+    color: #8a9ab5;
+    background: rgba(255,255,255,.03);
+    border-left: 3px solid rgba(14,165,160,.35);
+    border-radius: 0 6px 6px 0;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+.leave-item-remarks span.remark-label {
+    font-weight: 700;
+    color: #0ea5a0;
+    margin-right: 4px;
+}
+
+/* Action buttons row */
+.leave-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: .78rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: opacity .18s, transform .15s;
+    white-space: nowrap;
+}
+.lv-btn:hover:not(:disabled) { transform: translateY(-1px); opacity: .88; }
+.lv-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+.lv-btn-edit   { background: rgba(14,165,160,.15);  color: #0ea5a0;  border: 1px solid rgba(14,165,160,.3);  }
+.lv-btn-delete { background: rgba(255,107,107,.15); color: #ff7b7b;  border: 1px solid rgba(255,107,107,.3); }
+.lv-btn-print  { background: rgba(245,200,66,.12);  color: #f5c842;  border: 1px solid rgba(245,200,66,.28); }
+
+/* empty state */
+.leave-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #8a9ab5;
+    font-size: .9rem;
+}
+.leave-empty-icon { font-size: 2.2rem; margin-bottom: 8px; opacity: .5; }
+
+/* ── Responsive tweaks ────────────────────────────────────────────────────── */
+@media (max-width: 500px) {
+    .leave-item { padding: 14px; }
+    .leave-item-type { font-size: .88rem; }
+    .leave-header { flex-direction: column; align-items: flex-start; }
+    .leave-header .btn-new-leave { margin-left: 0; width: 100%; justify-content: center; }
+    .leave-filter-bar { width: 100%; }
+    .leave-filter-bar input[type="date"] { flex: 1; min-width: 0; }
 }
 </style>
 
@@ -206,7 +294,7 @@ $dbLT->close();
     <div class="leave-header">
         <h3>My Leave Applications</h3>
 
-        <!-- ── AJAX date-range filter — no <form>, no page reload ── -->
+        <!-- ── AJAX date-range filter ── -->
         <div class="leave-filter-bar">
             <label for="lf_date_from">From</label>
             <input type="date" id="lf_date_from"
@@ -230,73 +318,92 @@ $dbLT->close();
 
     <div class="leave-loading" id="leaveLoading">Loading…</div>
 
-    <div class="leave-table-wrap">
-        <table class="leave-table">
-            <thead>
-                <tr>
-                    <th>Actions</th>
-                    <th>Date Filed</th>
-                    <th>Particulars</th>
-                    <th>No. of Days</th>
-                    <th>Inclusive Dates</th>
-                    <th>Status</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody id="leaveTableBody">
-            <?php while ($row = $resLeave->fetch_assoc()):
-                $statusRaw   = $row['Status'];
-                $isPending   = (strtolower($statusRaw) === 'pending approval');
-                $statusClass = leaveStatusClass($statusRaw);
-                $rowData     = htmlspecialchars(json_encode([
-                    'app_ID'          => (int)$row['app_ID'],
-                    'lt_ID'           => (int)$row['lt_ID'],
-                    'dol_b'           => $row['DOL_B'],
-                    'dol_c'           => $row['DOL_C'] ?? '',
-                    'nod'             => $row['NOD'],
-                    'inclusive_dates' => $row['Inclusive_Dates'],
-                ]), ENT_QUOTES, 'UTF-8');
-            ?>
-                <tr id="leave-row-<?= $row['app_ID'] ?>">
-                    <td>
-                        <div class="action-buttons">
-                            <?php if ($isPending): ?>
-                            <button class="icon-btn btn-edit"
-                                    data-row="<?= $rowData ?>"
-                                    onclick="lmEditClick(this)">✏️</button>
-                            <button class="icon-btn btn-delete"
-                                    onclick="deleteLeave(<?= (int)$row['app_ID'] ?>)">🗑️</button>
-                            <?php else: ?>
-                            <button class="icon-btn btn-edit"   disabled>✏️</button>
-                            <button class="icon-btn btn-delete" disabled>🗑️</button>
-                            <?php endif; ?>
-                            <button class="icon-btn btn-print"
-                                    onclick="printLeave(<?= (int)$row['app_ID'] ?>)"
-                                    title="Print Leave Application">🖨️</button>
-                        </div>
-                    </td>
-                    <td>
-                        <?= date('M d, Y', strtotime($row['DOF'])) ?><br>
-                        <small><?= htmlspecialchars($row['TOF']) ?></small>
-                    </td>
-                    <td><?= htmlspecialchars($row['LeaveDescription']) ?></td>
-                    <td><?= htmlspecialchars($row['NOD']) ?></td>
-                    <td><?= htmlspecialchars($row['Inclusive_Dates']) ?></td>
-                    <td>
-                        <span class="status-chip <?= $statusClass ?>">
-                            <?= htmlspecialchars($statusRaw) ?>
-                        </span>
-                    </td>
-                    <td><?= !empty($row['Remarks']) ? htmlspecialchars($row['Remarks']) : '—' ?></td>
-                </tr>
-            <?php endwhile; ?>
-            </tbody>
-        </table>
+    <div class="leave-list" id="leaveTableBody">
+    <?php
+    $hasRows = false;
+    while ($row = $resLeave->fetch_assoc()):
+        $hasRows     = true;
+        $statusRaw   = $row['Status'];
+        $isPending   = (strtolower($statusRaw) === 'pending approval');
+        $statusClass = leaveStatusClass($statusRaw);
+        $rowData     = htmlspecialchars(json_encode([
+            'app_ID'          => (int)$row['app_ID'],
+            'lt_ID'           => (int)$row['lt_ID'],
+            'dol_b'           => $row['DOL_B'],
+            'dol_c'           => $row['DOL_C'] ?? '',
+            'nod'             => $row['NOD'],
+            'inclusive_dates' => $row['Inclusive_Dates'],
+        ]), ENT_QUOTES, 'UTF-8');
+    ?>
+        <div class="leave-item" id="leave-row-<?= $row['app_ID'] ?>">
+
+            <!-- Type + Status -->
+            <div class="leave-item-top">
+                <div class="leave-item-type">
+                    <?= htmlspecialchars($row['LeaveDescription']) ?>
+                </div>
+                <span class="status-chip <?= $statusClass ?>">
+                    <?= htmlspecialchars($statusRaw) ?>
+                </span>
+            </div>
+
+            <!-- Meta info -->
+            <div class="leave-item-meta">
+                <div class="leave-meta-pill">
+                    <span class="meta-icon">📅</span>
+                    <span>Filed: <strong><?= date('M d, Y', strtotime($row['DOF'])) ?></strong>
+                        <span style="opacity:.5;font-size:.72rem;">&nbsp;<?= htmlspecialchars($row['TOF']) ?></span>
+                    </span>
+                </div>
+                <div class="leave-meta-pill">
+                    <span class="meta-icon">🗓️</span>
+                    <span>Inclusive: <strong><?= htmlspecialchars($row['Inclusive_Dates']) ?></strong></span>
+                </div>
+                <div class="leave-meta-pill">
+                    <span class="meta-icon">⏱️</span>
+                    <span>Days: <strong><?= htmlspecialchars($row['NOD']) ?></strong></span>
+                </div>
+            </div>
+
+            <!-- Remarks -->
+            <?php if (!empty($row['Remarks'])): ?>
+            <div class="leave-item-remarks">
+                <span class="remark-label">Remarks:</span>
+                <?= htmlspecialchars($row['Remarks']) ?>
+            </div>
+            <?php endif; ?>
+
+            <!-- Action buttons -->
+            <div class="leave-item-actions">
+                <?php if ($isPending): ?>
+                <button class="lv-btn lv-btn-edit"
+                        data-row="<?= $rowData ?>"
+                        onclick="lmEditClick(this)">✏️ Edit</button>
+                <button class="lv-btn lv-btn-delete"
+                        onclick="deleteLeave(<?= (int)$row['app_ID'] ?>)">🗑️ Delete</button>
+                <?php else: ?>
+                <button class="lv-btn lv-btn-edit"   disabled>✏️ Edit</button>
+                <button class="lv-btn lv-btn-delete" disabled>🗑️ Delete</button>
+                <?php endif; ?>
+                <button class="lv-btn lv-btn-print"
+                        onclick="printLeave(<?= (int)$row['app_ID'] ?>)"
+                        title="Print Leave Application">🖨️ Print</button>
+            </div>
+        </div>
+    <?php endwhile; ?>
+
+    <?php if (!$hasRows): ?>
+        <div class="leave-empty">
+            <div class="leave-empty-icon">📋</div>
+            No leave applications found for this period.
+        </div>
+    <?php endif; ?>
     </div>
+
 </div>
 
 <script>
-/* ── Status → CSS class (mirrors PHP leaveStatusClass()) ─────────────────── */
+/* ── Status → CSS class ───────────────────────────────────────────────────── */
 function leaveGetStatusClass(status) {
     switch ((status || '').toLowerCase()) {
         case 'pending approval':    return 'status-pending';
@@ -315,75 +422,78 @@ function leaveFmtDate(dateStr) {
     return d.toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
 }
 
-/* ── Build a <tr> string from a JSON row returned by get_leaves.php ───────── */
+function esc(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── Build a card <div> from a JSON row returned by get_leaves.php ─────────── */
 function leaveBuildRow(row) {
     const isPending   = (row.Status || '').toLowerCase() === 'pending approval';
     const statusClass = leaveGetStatusClass(row.Status);
 
-    // Safely encode the data-row JSON for an HTML attribute
-    const rowDataObj = {
-        app_ID:          row.app_ID,
-        lt_ID:           row.lt_ID,
-        dol_b:           row.DOL_B,
-        dol_c:           row.DOL_C || '',
-        nod:             row.NOD,
-        inclusive_dates: row.Inclusive_Dates,
-    };
-    // Use a temporary element to safely set the attribute value
     const tmp = document.createElement('div');
-    tmp.dataset.row = JSON.stringify(rowDataObj);
+    tmp.dataset.row = JSON.stringify({
+        app_ID: row.app_ID, lt_ID: row.lt_ID,
+        dol_b: row.DOL_B, dol_c: row.DOL_C || '',
+        nod: row.NOD, inclusive_dates: row.Inclusive_Dates,
+    });
     const safeRowData = tmp.getAttribute('data-row')
-                           .replace(/&/g,'&amp;')
-                           .replace(/"/g,'&quot;');
+                           .replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 
-    const editBtn = isPending
-        ? `<button class="icon-btn btn-edit" data-row="${safeRowData}" onclick="lmEditClick(this)">✏️</button>`
-        : `<button class="icon-btn btn-edit" disabled>✏️</button>`;
-
+    const editBtn   = isPending
+        ? `<button class="lv-btn lv-btn-edit" data-row="${safeRowData}" onclick="lmEditClick(this)">✏️ Edit</button>`
+        : `<button class="lv-btn lv-btn-edit" disabled>✏️ Edit</button>`;
     const deleteBtn = isPending
-        ? `<button class="icon-btn btn-delete" onclick="deleteLeave(${parseInt(row.app_ID)})">🗑️</button>`
-        : `<button class="icon-btn btn-delete" disabled>🗑️</button>`;
+        ? `<button class="lv-btn lv-btn-delete" onclick="deleteLeave(${parseInt(row.app_ID)})">🗑️ Delete</button>`
+        : `<button class="lv-btn lv-btn-delete" disabled>🗑️ Delete</button>`;
 
-    const remarks = row.Remarks
-        ? row.Remarks.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-        : '—';
-    const desc = (row.LeaveDescription || '')
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const status = (row.Status || '')
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const tof  = (row.TOF || '')
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const incl = (row.Inclusive_Dates || '')
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const remarksHtml = row.Remarks
+        ? `<div class="leave-item-remarks"><span class="remark-label">Remarks:</span> ${esc(row.Remarks)}</div>`
+        : '';
+
+    const tofSmall = row.TOF
+        ? `<span style="opacity:.5;font-size:.72rem;">&nbsp;${esc(row.TOF)}</span>`
+        : '';
 
     return `
-        <tr id="leave-row-${parseInt(row.app_ID)}">
-            <td>
-                <div class="action-buttons">
-                    ${editBtn}
-                    ${deleteBtn}
-                    <button class="icon-btn btn-print"
-                            onclick="printLeave(${parseInt(row.app_ID)})"
-                            title="Print Leave Application">🖨️</button>
-                </div>
-            </td>
-            <td>${leaveFmtDate(row.DOF)}<br><small>${tof}</small></td>
-            <td>${desc}</td>
-            <td>${row.NOD || ''}</td>
-            <td>${incl}</td>
-            <td><span class="status-chip ${statusClass}">${status}</span></td>
-            <td>${remarks}</td>
-        </tr>`;
+    <div class="leave-item" id="leave-row-${parseInt(row.app_ID)}">
+        <div class="leave-item-top">
+            <div class="leave-item-type">${esc(row.LeaveDescription)}</div>
+            <span class="status-chip ${statusClass}">${esc(row.Status)}</span>
+        </div>
+        <div class="leave-item-meta">
+            <div class="leave-meta-pill">
+                <span class="meta-icon">📅</span>
+                <span>Filed: <strong>${leaveFmtDate(row.DOF)}</strong>${tofSmall}</span>
+            </div>
+            <div class="leave-meta-pill">
+                <span class="meta-icon">🗓️</span>
+                <span>Inclusive: <strong>${esc(row.Inclusive_Dates)}</strong></span>
+            </div>
+            <div class="leave-meta-pill">
+                <span class="meta-icon">⏱️</span>
+                <span>Days: <strong>${esc(row.NOD)}</strong></span>
+            </div>
+        </div>
+        ${remarksHtml}
+        <div class="leave-item-actions">
+            ${editBtn}
+            ${deleteBtn}
+            <button class="lv-btn lv-btn-print"
+                    onclick="printLeave(${parseInt(row.app_ID)})"
+                    title="Print Leave Application">🖨️ Print</button>
+        </div>
+    </div>`;
 }
 
 /* ── Core AJAX fetch ─────────────────────────────────────────────────────── */
 async function leaveFetchRows(dateFrom, dateTo) {
     const loading = document.getElementById('leaveLoading');
-    const tbody   = document.getElementById('leaveTableBody');
+    const list    = document.getElementById('leaveTableBody');
 
-    loading.style.display = 'block';
-    tbody.style.opacity   = '0.4';
-    tbody.style.pointerEvents = 'none';
+    loading.style.display    = 'block';
+    list.style.opacity       = '0.4';
+    list.style.pointerEvents = 'none';
 
     try {
         const params = new URLSearchParams({ date_from: dateFrom, date_to: dateTo });
@@ -393,20 +503,21 @@ async function leaveFetchRows(dateFrom, dateTo) {
         const data = await res.json();
         if (data.error) throw new Error(data.error);
 
-        tbody.innerHTML = data.rows.length
+        list.innerHTML = data.rows.length
             ? data.rows.map(leaveBuildRow).join('')
-            : `<tr><td colspan="7" style="text-align:center;color:#888;padding:20px;">
+            : `<div class="leave-empty">
+                   <div class="leave-empty-icon">📋</div>
                    No records found for this period.
-               </td></tr>`;
+               </div>`;
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#c0392b;padding:20px;">
-                               Error loading records. Please try again.
-                           </td></tr>`;
+        list.innerHTML = `<div class="leave-empty" style="color:#ff9a9a;">
+                              ⚠️ Error loading records. Please try again.
+                          </div>`;
         console.error('leaveFilter error:', err);
     } finally {
-        loading.style.display     = 'none';
-        tbody.style.opacity       = '1';
-        tbody.style.pointerEvents = '';
+        loading.style.display    = 'none';
+        list.style.opacity       = '1';
+        list.style.pointerEvents = '';
     }
 }
 
@@ -414,16 +525,8 @@ async function leaveFetchRows(dateFrom, dateTo) {
 function leaveFilter() {
     const from = document.getElementById('lf_date_from').value;
     const to   = document.getElementById('lf_date_to').value;
-
-    if (!from || !to) {
-        alert('Please select both From and To dates.');
-        return;
-    }
-    if (from > to) {
-        alert('"From" date cannot be later than "To" date.');
-        return;
-    }
-
+    if (!from || !to) { alert('Please select both From and To dates.'); return; }
+    if (from > to)    { alert('"From" date cannot be later than "To" date.'); return; }
     leaveFetchRows(from, to);
 }
 
@@ -432,10 +535,8 @@ function leaveFilterReset() {
     const year = new Date().getFullYear();
     const from = year + '-01-01';
     const to   = year + '-12-31';
-
     document.getElementById('lf_date_from').value = from;
     document.getElementById('lf_date_to').value   = to;
-
     leaveFetchRows(from, to);
 }
 </script>
