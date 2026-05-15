@@ -549,8 +549,9 @@ function lmBuildActionCell(row) {
 // CARD HELPERS
 // ─────────────────────────────────────────────
 
-function lmEscape(str) {
-    return String(str || '')
+function lmEscape(val) {
+    if (val === null || val === undefined) return '';
+    return String(val)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')

@@ -735,3 +735,89 @@
     .lm-cal-day  { font-size: .72rem; border-radius: 6px; }
     .lm-cal-grid { gap: 3px; }
 }
+/* ── FORCE CALENDAR GRID TO STAY 7 COLUMNS ON MOBILE ── */
+@media (max-width: 768px) {
+
+    .lm-cal-grid.lm-cal-days {
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        gap: 4px !important;
+    }
+
+    .lm-cal-day {
+        min-width: 0;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+    }
+
+}
+
+/* FIX: mobile calendar grid stability */
+.lm-cal-days {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+}
+
+.lm-cal-day {
+    width: 100%;
+    min-width: 0;
+}
+
+/* FIX: clearer selected state on mobile */
+.lm-cal-day--selected::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+/* ─────────────────────────────────────────────
+   FIXED RESPONSIVE 7-COLUMN CALENDAR (MOBILE SAFE)
+   ───────────────────────────────────────────── */
+
+.lm-cal-grid.lm-cal-days {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    width: 100%;
+}
+
+/* ensure day cells never force wrapping */
+.lm-cal-day {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* prevent parent from shrinking columns */
+.lm-cal-wrap {
+    overflow-x: hidden;
+}
+
+/* MOBILE FIX (important override) */
+@media (max-width: 768px) {
+    .lm-cal-grid.lm-cal-days {
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        gap: 3px !important;
+    }
+
+    .lm-cal-day {
+        font-size: 0.7rem;
+        border-radius: 6px;
+    }
+}
+
+/* EXTRA SAFETY for very small screens */
+@media (max-width: 360px) {
+    .lm-cal-day {
+        font-size: 0.65rem;
+    }
+}
