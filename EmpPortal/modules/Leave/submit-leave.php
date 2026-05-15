@@ -21,6 +21,7 @@ $dol_c           = trim($input['dol_c']             ?? '');
 $nod             = floatval($input['nod']           ?? 0);
 $inclusive_dates = trim($input['inclusive_dates']   ?? '');
 $emp_ID          = $_SESSION['emp_ID'];
+$leave_date = trim($input['leave_date'] ?? '');
 
 // ── Shared validation ──────────────────────────────────────────
 if (!$lt_ID) {
@@ -86,10 +87,11 @@ try {
                 DOL_B           = ?,
                 DOL_C           = ?,
                 NOD             = ?,
-                Inclusive_Dates = ?
+                Inclusive_Dates = ?,
+                Leave_Date       = ?
             WHERE app_ID = ? AND emp_ID = ?
         ");
-        $stmt->bind_param('isssdsii', $lt_ID, $dol_a, $dol_b, $dol_c, $nod, $inclusive_dates, $app_ID, $emp_ID);
+        $stmt->bind_param('isssdssii', $lt_ID, $dol_a, $dol_b, $dol_c, $nod, $inclusive_dates, $leave_date, $app_ID, $emp_ID);
         $stmt->execute();
         $stmt->close();
 
@@ -105,10 +107,10 @@ try {
         // ── INSERT path ────────────────────────────────────────
         $stmt = $db->prepare("
             INSERT INTO tblappleave
-            (emp_ID, lt_ID, DOF, TOF, DOL_A, DOL_B, DOL_C, NOD, Inclusive_Dates, Status)
-            VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, ?, ?, 'Pending Approval')
+            (emp_ID, lt_ID, DOF, TOF, DOL_A, DOL_B, DOL_C, NOD, Inclusive_Dates, Leave_Date, Status)
+            VALUES (?, ?, CURDATE(), CURTIME(), ?, ?, ?, ?, ?, ?, 'Pending Approval')
         ");
-        $stmt->bind_param('iisssds', $emp_ID, $lt_ID, $dol_a, $dol_b, $dol_c, $nod, $inclusive_dates);
+        $stmt->bind_param('iisssdss', $emp_ID, $lt_ID, $dol_a, $dol_b, $dol_c, $nod, $inclusive_dates, $leave_date);
         $stmt->execute();
 
         $new_app_ID = $db->insert_id;
@@ -154,6 +156,7 @@ function lmFetchRow($db, $app_ID) {
             a.TOF                            AS tof,
             a.NOD                            AS nod,
             a.Inclusive_Dates                AS inclusive_dates,
+            a.Leave_Date                     AS leave_date,
             a.Status                         AS status,
             COALESCE(a.Remarks, '')          AS remarks,
             a.lt_ID,
@@ -179,6 +182,7 @@ function lmFetchRow($db, $app_ID) {
         'dol_c'           => $row['dol_c'],
         'nod'             => $row['nod'],
         'inclusive_dates' => $row['inclusive_dates'],
+        'leave_date'      => $row['leave_date'],
     ];
 
     return $row;

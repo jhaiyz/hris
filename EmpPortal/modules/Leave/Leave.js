@@ -6,22 +6,18 @@ console.log("Leave module loaded");
 document.addEventListener('DOMContentLoaded', function () {
 
     var leaveModal = document.getElementById('leaveModal');
-
     if (leaveModal) {
         leaveModal.addEventListener('click', function (e) {
-            if (e.target === this) {
-                closeLeaveModal();
-            }
+            if (e.target === this) closeLeaveModal();
         });
     }
 
+    // Boot the calendar so it is ready before the modal is opened
+    lmCalInit();
 });
 
 // ─────────────────────────────────────────────
 // EDIT CLICK ENTRY POINT
-// Called via onclick="lmEditClick(this)" on the edit button.
-// Receives the button element as a real argument — avoids the
-// `this === window` trap in onclick="fn(this.dataset.x)".
 // ─────────────────────────────────────────────
 function lmEditClick(btn) {
     var row = JSON.parse(btn.getAttribute('data-row'));
@@ -38,7 +34,8 @@ function openLeaveModal(row) {
     var modal = document.getElementById('leaveModal');
     if (!modal) return;
 
-    resetLeaveForm();
+    resetLeaveForm();           // full reset (calendar included)
+    lmCalRender();              // make sure calendar grid is painted
 
     if (row) {
         // ── EDIT MODE ──────────────────────────────────
@@ -46,24 +43,19 @@ function openLeaveModal(row) {
         document.getElementById('lmSubmitLabel').textContent = 'Save Changes';
         document.getElementById('lm_appID').value            = row.app_ID;
 
-        // Leave type dropdown
         document.getElementById('lm_leaveType').value = row.lt_ID;
 
-        // Find the matching radio and check it
         var radios = document.querySelectorAll('input[name="lm_detail"]');
         radios.forEach(function (radio) {
             if (radio.value === row.dol_b) {
                 radio.checked = true;
-
-                // Fill companion text input with dol_c
                 var radioRow    = radio.closest('.lm-radio-row');
                 var detailInput = radioRow ? radioRow.querySelector('.lm-detail-input') : null;
-                if (detailInput) {
-                    detailInput.value = row.dol_c || '';
-                }
+                if (detailInput) detailInput.value = row.dol_c || '';
             }
         });
 
+        // Pre-fill the readonly fields; calendar selection stays empty in edit
         document.getElementById('lm_nod').value   = row.nod;
         document.getElementById('lm_dates').value = row.inclusive_dates;
 
@@ -75,16 +67,11 @@ function openLeaveModal(row) {
     }
 
     modal.classList.add('show');
-
 }
 
 function closeLeaveModal() {
-
     var modal = document.getElementById('leaveModal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
-
+    if (modal) modal.classList.remove('show');
 }
 
 // ─────────────────────────────────────────────
@@ -98,7 +85,6 @@ function resetLeaveForm() {
     document.querySelectorAll('input[name="lm_detail"]').forEach(function (r) {
         r.checked = false;
     });
-
     document.querySelectorAll('.lm-detail-input').forEach(function (i) {
         i.value = '';
         i.classList.remove('error');
@@ -107,9 +93,31 @@ function resetLeaveForm() {
     document.getElementById('lm_nod').value   = '';
     document.getElementById('lm_dates').value = '';
 
+    // Reset calendar state
+    lmCalSelectedDates = [];
+    lmCalViewYear  = new Date().getFullYear();
+    lmCalViewMonth = new Date().getMonth();
+
+    // Reset half-day radio
+    var amR = document.getElementById('lmHalfAM');
+    var pmR = document.getElementById('lmHalfPM');
+    if (amR) amR.checked = false;
+    if (pmR) pmR.checked = false;
+
+    var halfRow = document.getElementById('lmCalHalfRow');
+    if (halfRow) halfRow.style.display = 'none';
+
+    var preview = document.getElementById('lmCalPreview');
+    if (preview) preview.style.display = 'none';
+
+    var setBtn = document.getElementById('lmCalSetBtn');
+    if (setBtn) setBtn.disabled = true;
+
+    var countEl = document.getElementById('lmCalCount');
+    if (countEl) countEl.textContent = '0 day(s) selected';
+
     lmHideAlert();
     lmClearErrors();
-
 }
 
 // ─────────────────────────────────────────────
@@ -131,13 +139,245 @@ function lmShowAlert(msg, type) {
 
 function lmHideAlert() {
     var el = document.getElementById('lmAlert');
+    if (!el) return;
     el.style.display = 'none';
     el.className     = 'lm-alert';
 }
 
-// ─────────────────────────────────────────────
-// SUBMIT  (INSERT or UPDATE)
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  INLINE MULTI-DATE CALENDAR
+// ═══════════════════════════════════════════════════════════════
+
+var lmCalSelectedDates = [];   // array of "YYYY-MM-DD" strings
+var lmCalViewYear  = new Date().getFullYear();
+var lmCalViewMonth = new Date().getMonth();   // 0-based
+
+var LM_MONTH_NAMES = [
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
+];
+
+/** Call once on DOMContentLoaded to paint the initial calendar */
+function lmCalInit() {
+    lmCalViewYear  = new Date().getFullYear();
+    lmCalViewMonth = new Date().getMonth();
+    lmCalRender();
+}
+
+/** Render the calendar grid for the current view month */
+function lmCalRender() {
+
+    var label = document.getElementById('lmCalLabel');
+    var grid  = document.getElementById('lmCalDays');
+    if (!label || !grid) return;
+
+    label.textContent = LM_MONTH_NAMES[lmCalViewMonth] + ' ' + lmCalViewYear;
+
+    var firstDay  = new Date(lmCalViewYear, lmCalViewMonth, 1).getDay(); // 0=Sun
+    var daysInMon = new Date(lmCalViewYear, lmCalViewMonth + 1, 0).getDate();
+    var today     = lmCalTodayStr();
+
+    var html = '';
+
+    // Empty cells before day 1
+    for (var e = 0; e < firstDay; e++) {
+        html += '<div class="lm-cal-day lm-cal-day--empty"></div>';
+    }
+
+    for (var d = 1; d <= daysInMon; d++) {
+        var dateStr  = lmCalPad(lmCalViewYear) + '-'
+                     + lmCalPad(lmCalViewMonth + 1) + '-'
+                     + lmCalPad(d);
+        var dow      = new Date(lmCalViewYear, lmCalViewMonth, d).getDay();
+        var isWknd   = (dow === 0 || dow === 6);
+        var isToday  = (dateStr === today);
+        var isSelec  = lmCalSelectedDates.indexOf(dateStr) !== -1;
+
+        var cls = 'lm-cal-day';
+        if (isWknd)  cls += ' lm-cal-day--weekend';
+        if (isToday) cls += ' lm-cal-day--today';
+        if (isSelec) cls += ' lm-cal-day--selected';
+
+        var onclick = isWknd
+            ? ''
+            : ' onclick="lmCalToggle(\'' + dateStr + '\')"';
+
+        html += '<div class="' + cls + '"' + onclick + '>' + d + '</div>';
+    }
+
+    grid.innerHTML = html;
+}
+
+/** Toggle a date in the selection */
+function lmCalToggle(dateStr) {
+    var idx = lmCalSelectedDates.indexOf(dateStr);
+    if (idx === -1) {
+        lmCalSelectedDates.push(dateStr);
+    } else {
+        lmCalSelectedDates.splice(idx, 1);
+    }
+    lmCalSelectedDates.sort();
+    lmCalRender();
+    lmCalUpdateSummary();
+}
+
+/** Move the view by ±1 month */
+function lmCalMove(dir) {
+    lmCalViewMonth += dir;
+    if (lmCalViewMonth > 11) { lmCalViewMonth = 0;  lmCalViewYear++; }
+    if (lmCalViewMonth < 0)  { lmCalViewMonth = 11; lmCalViewYear--; }
+    lmCalRender();
+}
+
+/** Update count label, preview, half-day row, and SET button state */
+function lmCalUpdateSummary() {
+
+    var n         = lmCalSelectedDates.length;
+    var halfRow   = document.getElementById('lmCalHalfRow');
+    var preview   = document.getElementById('lmCalPreview');
+    var previewTx = document.getElementById('lmCalPreviewText');
+    var countEl   = document.getElementById('lmCalCount');
+    var setBtn    = document.getElementById('lmCalSetBtn');
+
+    // Show half-day option only when exactly 1 date is selected
+    if (halfRow) {
+        halfRow.style.display = (n === 1) ? 'flex' : 'none';
+        if (n !== 1) {
+            // Clear half-day radios if deselected
+            var amR = document.getElementById('lmHalfAM');
+            var pmR = document.getElementById('lmHalfPM');
+            if (amR) amR.checked = false;
+            if (pmR) pmR.checked = false;
+        }
+    }
+
+    // Compute effective days (0.5 for half-day, else count)
+    var halfChecked = document.querySelector('input[name="lm_half"]:checked');
+    var isHalf = (n === 1 && halfChecked);
+    var days   = isHalf ? 0.5 : n;
+
+    if (n === 0) {
+        if (countEl) countEl.textContent = '0 day(s) selected';
+        if (preview) preview.style.display = 'none';
+        if (setBtn)  setBtn.disabled = true;
+        return;
+    }
+
+    if (countEl) {
+        countEl.textContent = days + ' day' + (days !== 1 ? 's' : '') + ' selected';
+    }
+
+    // Generate inclusive-dates caption
+    var caption = lmCalBuildCaption(isHalf, halfChecked ? halfChecked.value : null);
+    if (previewTx) previewTx.textContent = caption;
+    if (preview)   preview.style.display = 'flex';
+    if (setBtn)    setBtn.disabled = false;
+}
+
+/**
+ * Build the human-readable caption for the inclusive dates field.
+ * Groups consecutive dates in the same month into ranges.
+ * e.g. "January 6-8, 10, 2025" or "January 6, 2025 (AM)"
+ */
+function lmCalBuildCaption(isHalf, halfSuffix) {
+
+    if (lmCalSelectedDates.length === 0) return '';
+
+    // Group by year-month
+    var byMonth = {};
+    lmCalSelectedDates.forEach(function (ds) {
+        var parts = ds.split('-');
+        var key   = parts[0] + '-' + parts[1];
+        if (!byMonth[key]) byMonth[key] = [];
+        byMonth[key].push(parseInt(parts[2], 10));
+    });
+
+    var keys    = Object.keys(byMonth).sort();
+    var parts   = [];
+
+    keys.forEach(function (key) {
+        var yp    = key.split('-');
+        var year  = yp[0];
+        var month = parseInt(yp[1], 10);
+        var days  = byMonth[key].slice().sort(function(a,b){ return a-b; });
+
+        // Build ranges: e.g. [6,7,8,10] → "6-8, 10"
+        var ranges = [];
+        var start  = days[0], end = days[0];
+        for (var i = 1; i < days.length; i++) {
+            if (days[i] === end + 1) {
+                end = days[i];
+            } else {
+                ranges.push(start === end ? String(start) : start + '-' + end);
+                start = end = days[i];
+            }
+        }
+        ranges.push(start === end ? String(start) : start + '-' + end);
+
+        parts.push(LM_MONTH_NAMES[month - 1] + ' ' + ranges.join(', ') + ', ' + year);
+    });
+
+    var caption = parts.join('; ');
+    if (isHalf && halfSuffix) caption += ' (' + halfSuffix + ')';
+    return caption;
+}
+
+/** Apply selection → fill the NOD and Inclusive Dates fields */
+function lmCalApply() {
+
+    var n = lmCalSelectedDates.length;
+    if (n === 0) return;
+
+    var halfChecked = document.querySelector('input[name="lm_half"]:checked');
+    var isHalf = (n === 1 && halfChecked);
+    var days   = isHalf ? 0.5 : n;
+
+    var caption = lmCalBuildCaption(isHalf, halfChecked ? halfChecked.value : null);
+
+    document.getElementById('lm_nod').value   = days;
+    document.getElementById('lm_dates').value = caption;
+
+    // Visual feedback on the SET button
+    var btn = document.getElementById('lmCalSetBtn');
+    var orig = btn.textContent;
+    btn.textContent = '✔ Applied!';
+    btn.style.background = 'linear-gradient(135deg,#06d6a0,#00b894)';
+    setTimeout(function () {
+        btn.textContent = '✔ Set Dates & Days';
+        btn.style.background = '';
+    }, 1400);
+
+    lmHideAlert();
+    document.getElementById('lm_nod').classList.remove('error');
+    document.getElementById('lm_dates').classList.remove('error');
+}
+
+/** Clear all selected dates */
+function lmCalClearAll() {
+    lmCalSelectedDates = [];
+
+    var amR = document.getElementById('lmHalfAM');
+    var pmR = document.getElementById('lmHalfPM');
+    if (amR) amR.checked = false;
+    if (pmR) pmR.checked = false;
+
+    document.getElementById('lm_nod').value   = '';
+    document.getElementById('lm_dates').value = '';
+
+    lmCalRender();
+    lmCalUpdateSummary();
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+function lmCalTodayStr() {
+    var t = new Date();
+    return lmCalPad(t.getFullYear()) + '-' + lmCalPad(t.getMonth() + 1) + '-' + lmCalPad(t.getDate());
+}
+function lmCalPad(n) { return String(n).padStart(2, '0'); }
+
+// ═══════════════════════════════════════════════════════════════
+//  SUBMIT  (INSERT or UPDATE)
+// ═══════════════════════════════════════════════════════════════
 async function submitLeave() {
 
     lmHideAlert();
@@ -185,13 +425,13 @@ async function submitLeave() {
 
     if (!nod || parseFloat(nod) <= 0) {
         document.getElementById('lm_nod').classList.add('error');
-        if (valid) lmShowAlert('Invalid number of days.');
+        if (valid) lmShowAlert('Please select dates using the calendar above, then click "Set Dates & Days".');
         valid = false;
     }
 
     if (!dates) {
         document.getElementById('lm_dates').classList.add('error');
-        if (valid) lmShowAlert('Inclusive dates required.');
+        if (valid) lmShowAlert('Please select dates using the calendar above, then click "Set Dates & Days".');
         valid = false;
     }
 
@@ -215,6 +455,16 @@ async function submitLeave() {
 
     try {
 
+        // Convert selected dates into MM/DD/YYYY,MM/DD/YYYY format
+        var leaveDate = lmCalSelectedDates.map(function(dateStr) {
+
+            // dateStr is YYYY-MM-DD
+            var p = dateStr.split('-');
+
+            return p[1] + '/' + p[2] + '/' + p[0];
+
+        }).join(',');
+
         var payload = {
             app_ID:          appID ? parseInt(appID) : null,
             lt_ID:           leaveType,
@@ -222,7 +472,8 @@ async function submitLeave() {
             dol_b:           dolB,
             dol_c:           detailC,
             nod:             parseFloat(nod),
-            inclusive_dates: dates
+            inclusive_dates: dates,
+            leave_date:      leaveDate
         };
 
         var res  = await fetch('./modules/leave/submit-leave.php', {
@@ -259,7 +510,6 @@ async function submitLeave() {
         btn.disabled          = false;
         spinner.style.display = 'none';
     }
-
 }
 
 // ─────────────────────────────────────────────
@@ -295,48 +545,176 @@ function lmBuildActionCell(row) {
         + '</div>';
 }
 
-function lmPatchRow(row) {
+// ─────────────────────────────────────────────
+// CARD HELPERS
+// ─────────────────────────────────────────────
 
-    var tr = document.getElementById('leave-row-' + row.app_ID);
-    if (!tr) return;
-
-    tr.querySelector('td:nth-child(1)').innerHTML   = lmBuildActionCell(row);
-    tr.querySelector('td:nth-child(3)').textContent = row.leave_description;
-    tr.querySelector('td:nth-child(4)').textContent = row.nod;
-    tr.querySelector('td:nth-child(5)').textContent = row.inclusive_dates;
-    tr.querySelector('td:nth-child(6)').innerHTML   =
-        '<span class="status-chip ' + lmStatusClass(row.status) + '">' + row.status + '</span>';
-    tr.querySelector('td:nth-child(7)').textContent = row.remarks || '—';
-
-    tr.style.transition = 'background 0.4s';
-    tr.style.background = 'rgba(14,165,160,0.15)';
-    setTimeout(function () { tr.style.background = ''; }, 1400);
-
+function lmEscape(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
+function lmBuildCard(row) {
+
+    var statusClass = lmStatusClass(row.status || '');
+    var isPending   = (row.status || '').toLowerCase() === 'pending approval';
+
+    var encoded = JSON.stringify(row.edit_data || {})
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;');
+
+    var remarksHtml = row.remarks
+        ? `
+            <div class="leave-item-remarks">
+                <span class="remark-label">Remarks:</span>
+                ${lmEscape(row.remarks)}
+            </div>
+        `
+        : '';
+
+    var editBtn = isPending
+        ? `
+            <button class="lv-btn lv-btn-edit"
+                    data-row="${encoded}"
+                    onclick="lmEditClick(this)">
+                ✏️ Edit
+            </button>
+        `
+        : `
+            <button class="lv-btn lv-btn-edit" disabled>
+                ✏️ Edit
+            </button>
+        `;
+
+    var deleteBtn = isPending
+        ? `
+            <button class="lv-btn lv-btn-delete"
+                    onclick="deleteLeave(${row.app_ID})">
+                🗑️ Delete
+            </button>
+        `
+        : `
+            <button class="lv-btn lv-btn-delete" disabled>
+                🗑️ Delete
+            </button>
+        `;
+
+    return `
+        <div class="leave-item" id="leave-row-${row.app_ID}">
+
+            <div class="leave-item-top">
+                <div class="leave-item-type">
+                    ${lmEscape(row.leave_description)}
+                </div>
+
+                <span class="status-chip ${statusClass}">
+                    ${lmEscape(row.status)}
+                </span>
+            </div>
+
+            <div class="leave-item-meta">
+
+                <div class="leave-meta-pill">
+                    <span class="meta-icon">📅</span>
+                    <span>
+                        Filed:
+                        <strong>${lmEscape(row.dof_formatted)}</strong>
+
+                        <span style="opacity:.5;font-size:.72rem;">
+                            &nbsp;${lmEscape(row.tof)}
+                        </span>
+                    </span>
+                </div>
+
+                <div class="leave-meta-pill">
+                    <span class="meta-icon">🗓️</span>
+                    <span>
+                        Inclusive:
+                        <strong>${lmEscape(row.inclusive_dates)}</strong>
+                    </span>
+                </div>
+
+                <div class="leave-meta-pill">
+                    <span class="meta-icon">⏱️</span>
+                    <span>
+                        Days:
+                        <strong>${lmEscape(row.nod)}</strong>
+                    </span>
+                </div>
+
+            </div>
+
+            ${remarksHtml}
+
+            <div class="leave-item-actions">
+
+                ${editBtn}
+
+                ${deleteBtn}
+
+                <button class="lv-btn lv-btn-print"
+                        onclick="printLeave(${row.app_ID})"
+                        title="Print Leave Application">
+                    🖨️ Print
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
+
+// ─────────────────────────────────────────────
+// UPDATE EXISTING CARD
+// ─────────────────────────────────────────────
+function lmPatchRow(row) {
+
+    var oldCard = document.getElementById('leave-row-' + row.app_ID);
+    if (!oldCard) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = lmBuildCard(row);
+
+    var newCard = wrapper.firstElementChild;
+
+    oldCard.replaceWith(newCard);
+
+    newCard.style.transition = 'background .4s';
+    newCard.style.background = 'rgba(14,165,160,.15)';
+
+    setTimeout(function () {
+        newCard.style.background = '';
+    }, 1400);
+}
+
+// ─────────────────────────────────────────────
+// ADD NEW CARD
+// ─────────────────────────────────────────────
 function lmPrependRow(row) {
 
-    var tbody = document.getElementById('leaveTableBody');
-    if (!tbody) return;
+    var list = document.getElementById('leaveTableBody');
+    if (!list) return;
 
-    var tr = document.createElement('tr');
-    tr.id  = 'leave-row-' + row.app_ID;
+    // remove empty state if exists
+    var empty = list.querySelector('.leave-empty');
+    if (empty) empty.remove();
 
-    tr.innerHTML =
-        '<td>' + lmBuildActionCell(row) + '</td>'
-        + '<td>' + row.dof_formatted + '<br><small>' + row.tof + '</small></td>'
-        + '<td>' + row.leave_description + '</td>'
-        + '<td>' + row.nod + '</td>'
-        + '<td>' + row.inclusive_dates + '</td>'
-        + '<td><span class="status-chip ' + lmStatusClass(row.status) + '">' + row.status + '</span></td>'
-        + '<td>' + (row.remarks || '—') + '</td>';
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = lmBuildCard(row);
 
-    tbody.insertBefore(tr, tbody.firstChild);
+    var card = wrapper.firstElementChild;
 
-    tr.style.transition = 'background 0.4s';
-    tr.style.background = 'rgba(14,165,160,0.15)';
-    setTimeout(function () { tr.style.background = ''; }, 1400);
+    list.insertBefore(card, list.firstChild);
 
+    card.style.transition = 'background .4s';
+    card.style.background = 'rgba(14,165,160,.15)';
+
+    setTimeout(function () {
+        card.style.background = '';
+    }, 1400);
 }
 
 // ─────────────────────────────────────────────
@@ -347,27 +725,44 @@ function deleteLeave(appID) {
     var row = document.getElementById('leave-row-' + appID);
     if (!row) return;
 
-    // extract values from table row
-    var particulars = row.querySelector('td:nth-child(3)').innerText;
-    var nod         = row.querySelector('td:nth-child(4)').innerText;
-    var dates       = row.querySelector('td:nth-child(5)').innerText;
+    // CARD VALUES
+    var particularsEl = row.querySelector('.leave-item-type');
 
-    // fill modal
+    var metaPills = row.querySelectorAll('.leave-meta-pill strong');
+
+    var dates = '';
+    var nod   = '';
+
+    if (metaPills[0]) {
+        // first strong = filed date
+    }
+
+    if (metaPills[1]) {
+        dates = metaPills[1].innerText;
+    }
+
+    if (metaPills[2]) {
+        nod = metaPills[2].innerText;
+    }
+
     document.getElementById('del_appID').value = appID;
-    document.getElementById('del_particulars').innerText = particulars;
+
+    document.getElementById('del_particulars').innerText =
+        particularsEl ? particularsEl.innerText : '';
+
     document.getElementById('del_nod').innerText = nod;
     document.getElementById('del_dates').innerText = dates;
 
-    // show modal
     document.getElementById('deleteLeaveModal').classList.add('show');
 }
+
 function closeDeleteModal() {
     document.getElementById('deleteLeaveModal').classList.remove('show');
 }
+
 async function confirmDeleteLeave() {
 
-    var appID = document.getElementById('del_appID').value;
-
+    var appID   = document.getElementById('del_appID').value;
     var btn     = document.querySelector('#deleteLeaveModal .lm-btn-submit');
     var spinner = document.getElementById('delSpinner');
 
@@ -385,17 +780,13 @@ async function confirmDeleteLeave() {
         var data = await res.json();
 
         if (data.success) {
-
             var tr = document.getElementById('leave-row-' + appID);
-
             if (tr) {
                 tr.style.transition = 'opacity .3s';
-                tr.style.opacity = '0';
+                tr.style.opacity    = '0';
                 setTimeout(() => tr.remove(), 300);
             }
-
             closeDeleteModal();
-
         } else {
             alert(data.message || 'Delete failed.');
         }

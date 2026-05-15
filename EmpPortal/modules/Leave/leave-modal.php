@@ -132,19 +132,71 @@
             <!-- 6.C NUMBER OF DAYS -->
             <div class="lm-section">
                 <div class="lm-section-label">6.C — Number of Working Days Applied For</div>
-                <div class="lm-row-two">
+
+                <!-- ── Inline multi-date calendar ── -->
+                <div class="lm-cal-wrap" id="lmCalWrap">
+
+                    <!-- Calendar nav -->
+                    <div class="lm-cal-nav">
+                        <button type="button" class="lm-cal-arrow" id="lmCalPrev" onclick="lmCalMove(-1)">&#8249;</button>
+                        <span class="lm-cal-month-label" id="lmCalLabel"></span>
+                        <button type="button" class="lm-cal-arrow" id="lmCalNext" onclick="lmCalMove(1)">&#8250;</button>
+                    </div>
+
+                    <!-- Day-of-week headers -->
+                    <div class="lm-cal-grid lm-cal-dow">
+                        <span>Sun</span><span>Mon</span><span>Tue</span>
+                        <span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+
+                    <!-- Day cells — rendered by JS -->
+                    <div class="lm-cal-grid lm-cal-days" id="lmCalDays"></div>
+
+                    <!-- Half-day toggle -->
+                    <div class="lm-cal-half-row" id="lmCalHalfRow" style="display:none;">
+                        <span class="lm-cal-half-label">Half-day selection:</span>
+                        <label class="lm-half-toggle">
+                            <input type="radio" name="lm_half" value="AM" id="lmHalfAM" onchange="lmCalUpdateSummary()"> AM
+                        </label>
+                        <label class="lm-half-toggle">
+                            <input type="radio" name="lm_half" value="PM" id="lmHalfPM" onchange="lmCalUpdateSummary()"> PM
+                        </label>
+                    </div>
+
+                    <!-- Summary bar -->
+                    <div class="lm-cal-summary" id="lmCalSummary">
+                        <span id="lmCalCount" class="lm-cal-count">0 day(s) selected</span>
+                        <button type="button" class="lm-cal-clear" onclick="lmCalClearAll()">Clear all</button>
+                    </div>
+
+                    <!-- Preview of generated caption -->
+                    <div class="lm-cal-preview" id="lmCalPreview" style="display:none;">
+                        <span class="lm-cal-preview-label">Inclusive dates preview:</span>
+                        <span class="lm-cal-preview-text" id="lmCalPreviewText"></span>
+                    </div>
+
+                    <!-- SET button -->
+                    <button type="button" class="lm-cal-set-btn" id="lmCalSetBtn" onclick="lmCalApply()" disabled>
+                        ✔ Set Dates &amp; Days
+                    </button>
+                </div>
+
+                <!-- The actual saved fields (read-only display, filled by calendar) -->
+                <div class="lm-row-two" style="margin-top:12px;">
                     <div class="lm-field">
                         <label class="lm-label">Number of Days</label>
-                        <input type="number" id="lm_nod" min="0.5" step="0.5" placeholder="e.g. 1" class="lm-input">
+                        <input type="number" id="lm_nod" min="0.5" step="0.5"
+                               placeholder="Auto-filled by calendar" class="lm-input" readonly
+                               style="background:rgba(14,165,160,.06); cursor:default;">
                     </div>
                     <div class="lm-field lm-field--wide">
                         <label class="lm-label">Inclusive Dates</label>
-                        <input type="text" id="lm_dates" placeholder="e.g. January 10-11, 2025" class="lm-input">
+                        <input type="text" id="lm_dates"
+                               placeholder="Auto-filled by calendar" class="lm-input" readonly
+                               style="background:rgba(14,165,160,.06); cursor:default;">
                     </div>
                 </div>
             </div>
-
-            
 
         </div><!-- end lm-body -->
 
@@ -158,7 +210,7 @@
         </div>
 
         <!-- Alert -->
-            <div class="lm-alert" id="lmAlert"></div>
+        <div class="lm-alert" id="lmAlert"></div>
 
     </div>
 </div>

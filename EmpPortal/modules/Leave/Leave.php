@@ -403,6 +403,7 @@ $dbLT->close();
 </div>
 
 <script>
+    const basePath = '/hris/empportal/modules/leave/';
 /* ── Status → CSS class ───────────────────────────────────────────────────── */
 function leaveGetStatusClass(status) {
     switch ((status || '').toLowerCase()) {
@@ -423,7 +424,14 @@ function leaveFmtDate(dateStr) {
 }
 
 function esc(str) {
-    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (str === null || str === undefined) return '';
+
+    // convert numbers/objects to string safely
+    return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
 }
 
 /* ── Build a card <div> from a JSON row returned by get_leaves.php ─────────── */
@@ -435,7 +443,7 @@ function leaveBuildRow(row) {
     tmp.dataset.row = JSON.stringify({
         app_ID: row.app_ID, lt_ID: row.lt_ID,
         dol_b: row.DOL_B, dol_c: row.DOL_C || '',
-        nod: row.NOD, inclusive_dates: row.Inclusive_Dates,
+        nod: row.NOD, inclusive_dates: row.Inclusive_Dates, leave_date: row.leave_date
     });
     const safeRowData = tmp.getAttribute('data-row')
                            .replace(/&/g,'&amp;').replace(/"/g,'&quot;');
@@ -487,6 +495,7 @@ function leaveBuildRow(row) {
 }
 
 /* ── Core AJAX fetch ─────────────────────────────────────────────────────── */
+
 async function leaveFetchRows(dateFrom, dateTo) {
     const loading = document.getElementById('leaveLoading');
     const list    = document.getElementById('leaveTableBody');
@@ -497,7 +506,7 @@ async function leaveFetchRows(dateFrom, dateTo) {
 
     try {
         const params = new URLSearchParams({ date_from: dateFrom, date_to: dateTo });
-        const res    = await fetch('Modules/Leave/get_leaves.php?' + params);
+        const res = await fetch(basePath + 'get_leaves.php?' + params);
         if (!res.ok) throw new Error('Network error ' + res.status);
 
         const data = await res.json();

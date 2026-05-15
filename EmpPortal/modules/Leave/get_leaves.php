@@ -36,6 +36,7 @@ $sql = "
         a.TOF,
         a.NOD,
         a.Inclusive_Dates,
+        a.Leave_Date,
         a.Status,
         a.Remarks,
         a.DOL_A,
@@ -58,9 +59,31 @@ $sql = "
 ";
 
 $stmt = $db->prepare($sql);
+
+if (!$stmt) {
+    echo json_encode([
+        'error' => 'Prepare failed: ' . $db->error
+    ]);
+    exit;
+}
+
 $stmt->bind_param('iss', $_SESSION['emp_ID'], $filterFrom, $filterTo);
-$stmt->execute();
-$res  = $stmt->get_result();
+
+if (!$stmt->execute()) {
+    echo json_encode([
+        'error' => 'Execute failed: ' . $stmt->error
+    ]);
+    exit;
+}
+
+$res = $stmt->get_result();
+
+if (!$res) {
+    echo json_encode([
+        'error' => 'Get result failed: ' . $stmt->error
+    ]);
+    exit;
+}
 
 $rows = [];
 while ($row = $res->fetch_assoc()) {
