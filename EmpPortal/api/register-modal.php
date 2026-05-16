@@ -541,6 +541,13 @@
                     <input type="text" id="reg_ph_accred" placeholder="PH Accreditation No.">
                 </div>
             </div>
+
+            <div class="form-grid cols-1">
+                <div class="reg-field">
+                    <label>Professional Suffixes <span class="optional-tag">optional</span></label>
+                    <input type="text" id="reg_prof_suffixes" placeholder="e.g., MPA, RN, LPT, etc.">
+                </div>
+            </div>
         </div>
 
         <div class="modal-footer">
@@ -610,7 +617,7 @@ function overlayClick(e) {
 function clearRegForm() {
     ['reg_emp_no','reg_nickname','reg_first','reg_middle','reg_last','reg_ext',
      'reg_birthday','reg_office','reg_emp_status','reg_position',
-     'reg_mobile','reg_email','reg_emergency','reg_prc','reg_ph_accred'].forEach(id => {
+     'reg_mobile','reg_email','reg_emergency','reg_prc','reg_ph_accred','reg_prof_suffixes'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
@@ -647,6 +654,7 @@ async function doRegister() {
     const s2No        = g('reg_s2');
     const s2DateExp   = g('reg_s2_exp');
     const phAccred    = g('reg_ph_accred');
+    const profSuffixes   = g('reg_prof_suffixes');
 
     const required = [
         [empNo,     'Employee No.'],
@@ -702,7 +710,8 @@ async function doRegister() {
                 PRC_ExpDate:       prcDateExp,
                 S2_No:             s2No,
                 S2_ExpDate:        s2DateExp,
-                PH_Accred:         phAccred
+                PH_Accred:         phAccred,
+                Prof_Suffixes:     profSuffixes
             })
         });
         const data = await res.json();

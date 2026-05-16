@@ -40,6 +40,7 @@ $phAccred    = s($data['PH_Accred']);
 $cpEmergency = s($data['CP_Emergency']);
 $s2No        = s($data['S2_No']);
 $s2ExpDate   = s($data['S2_ExpDate']);
+$profSuffixes = s($data['Prof_Suffixes']);
 
 // Server-side required check
 $required = [
@@ -125,16 +126,16 @@ $stmt = $db->prepare("
         (Employee_No, Nick_Name, First_Name, Middle_Name, Last_Name, Ext_Name,
          Full_Name, Birthday, Office, Mobile_No, Email, Employment_Status,
          Position, Status, Password, PRC_No, PRC_ExpDate, PH_Accred, CP_Emergency,
-         S2_No, S2_ExpDate)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', '123456', ?, ?, ?, ?, ?, ?)
+         S2_No, S2_ExpDate, Prof_Suffixes)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', '123456', ?, ?, ?, ?, ?, ?, ?)
 ");
 
 $stmt->bind_param(
-    'sssssssssssssssssss',
+    'ssssssssssssssssssss',
     $empNo, $nickName, $firstName, $middleName, $lastName, $extName,
     $fullName, $birthday, $office, $mobileNo, $email, $empStatus,
     $position, $prcNo, $prcExpDate, $phAccred, $cpEmergency,
-    $s2No, $s2ExpDate
+    $s2No, $s2ExpDate, $profSuffixes
 );
 
 if ($stmt->execute()) {
