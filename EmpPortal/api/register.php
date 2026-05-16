@@ -35,8 +35,11 @@ $email       = s($data['Email']);
 $empStatus   = s($data['Employment_Status']);
 $position    = s($data['Position']);
 $prcNo       = s($data['PRC_No']);
+$prcExpDate  = s($data['PRC_ExpDate']);
 $phAccred    = s($data['PH_Accred']);
 $cpEmergency = s($data['CP_Emergency']);
+$s2No        = s($data['S2_No']);
+$s2ExpDate   = s($data['S2_ExpDate']);
 
 // Server-side required check
 $required = [
@@ -56,6 +59,18 @@ foreach ($required as $label => $val) {
         echo json_encode(['success' => false, 'message' => "$label is required."]);
         exit;
     }
+}
+
+// Conditional required: PRC_ExpDate required if PRC_No is filled
+if (!empty($prcNo) && empty($prcExpDate)) {
+    echo json_encode(['success' => false, 'message' => 'PRC Expiration Date is required when PRC No. is provided.']);
+    exit;
+}
+
+// Conditional required: S2_ExpDate required if S2_No is filled
+if (!empty($s2No) && empty($s2ExpDate)) {
+    echo json_encode(['success' => false, 'message' => 'S2 Expiration Date is required when S2 No. is provided.']);
+    exit;
 }
 
 $db = getDB();
@@ -90,6 +105,9 @@ if (!empty($prcNo)) {
 if (!empty($phAccred)) {
     checkDuplicate($db, 'PH_Accred', $phAccred, 'PhilHealth Accreditation', $duplicates);
 }
+if (!empty($s2No)) {
+    checkDuplicate($db, 'S2_No',     $s2No,     'S2 No.',     $duplicates);
+}
 
 if (!empty($duplicates)) {
     $list = implode(', ', $duplicates);
@@ -106,15 +124,17 @@ $stmt = $db->prepare("
     INSERT INTO tblemp
         (Employee_No, Nick_Name, First_Name, Middle_Name, Last_Name, Ext_Name,
          Full_Name, Birthday, Office, Mobile_No, Email, Employment_Status,
-         Position, Status, Password, PRC_No, PH_Accred, CP_Emergency)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', '123456', ?, ?, ?)
+         Position, Status, Password, PRC_No, PRC_ExpDate, PH_Accred, CP_Emergency,
+         S2_No, S2_ExpDate)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', '123456', ?, ?, ?, ?, ?, ?)
 ");
 
 $stmt->bind_param(
-    'ssssssssssssssss',
+    'sssssssssssssssssss',
     $empNo, $nickName, $firstName, $middleName, $lastName, $extName,
     $fullName, $birthday, $office, $mobileNo, $email, $empStatus,
-    $position, $prcNo, $phAccred, $cpEmergency
+    $position, $prcNo, $prcExpDate, $phAccred, $cpEmergency,
+    $s2No, $s2ExpDate
 );
 
 if ($stmt->execute()) {
