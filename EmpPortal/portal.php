@@ -4,7 +4,7 @@ requireLogin();
 
 // Refresh employee data from DB
 $db   = getDB();
-$stmt = $db->prepare("SELECT emp_ID, Full_Name, imgPath FROM tblemp WHERE emp_ID = ?");
+$stmt = $db->prepare("SELECT emp_ID, Full_Name, Nick_Name, imgPath FROM tblemp WHERE emp_ID = ?");
 $stmt->bind_param('i', $_SESSION['emp_ID']);
 $stmt->execute();
 $emp = $stmt->get_result()->fetch_assoc();
@@ -18,6 +18,8 @@ if (!$emp) {
 }
 
 $_SESSION['imgPath'] = $emp['imgPath'];
+$_SESSION['Full_Name'] = $emp['Full_Name'];
+$_SESSION['Nick_Name'] = $emp['Nick_Name'];
 $imgSrc = (!empty($emp['imgPath']))
    ? 'http://localhost:8080/hris/photos/' . htmlspecialchars($emp['imgPath'])
     : '';
@@ -718,8 +720,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
                 <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
             </div>
         </div>
-        <div class="emp-name"><?= htmlspecialchars($emp['Full_Name']) ?></div>
-        <div class="emp-label">Employee</div>
+        <div class="emp-name"><?= htmlspecialchars($emp['Nick_Name']) ?></div>
     </div>
 
     <!-- Navigation -->
@@ -842,7 +843,7 @@ $balanceSL = $leave['BalanceSL'] ?? 0;
         <div class="panel active" id="panel-dashboard">
             <div class="dash-welcome">
                 <div class="welcome-text">
-                    <h2>Good day, <?= htmlspecialchars(explode(' ', $emp['Full_Name'])[0]) ?>!</h2>
+                    <h2>Good day, <?= htmlspecialchars(explode(' ', $emp['Nick_Name'])[0]) ?>!</h2>
                     <p>Welcome to the Employee Self-Service Portal. Here's your overview for today.</p>
                 </div>
             </div>
